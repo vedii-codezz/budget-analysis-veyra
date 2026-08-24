@@ -7,7 +7,6 @@ import { SectionLabel } from "@/components/ui/SectionLabel";
 import { DisplayNumber } from "@/components/ui/DisplayNumber";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { ArrowDown, Compass, ShieldCheck, TrendingUp } from "lucide-react";
-import { motion } from "framer-motion";
 import { formatPercentage } from "@/lib/utils/currency";
 
 export const CinematicHero: React.FC = () => {
@@ -23,7 +22,7 @@ export const CinematicHero: React.FC = () => {
   const savingsRate = getSavingsRate();
   const availableLiquidity = Math.max(0, income - monthlySpend);
 
-  // Interactive subtle particle canvas behind hero
+  // Calm, atmospheric ambient lighting behind hero
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -41,7 +40,6 @@ export const CinematicHero: React.FC = () => {
     };
     window.addEventListener("resize", handleResize);
 
-    // Mouse tracking for subtle atmospheric tilt
     let mouse = { x: width / 2, y: height / 2, targetX: width / 2, targetY: height / 2 };
     const handleMouseMove = (e: MouseEvent) => {
       mouse.targetX = e.clientX;
@@ -49,69 +47,52 @@ export const CinematicHero: React.FC = () => {
     };
     window.addEventListener("mousemove", handleMouseMove);
 
-    // Node particle network
-    const particleCount = reducedMotion ? 20 : 45;
+    // Minimal calm ambient dust particles (low count, no connecting lines)
+    const particleCount = reducedMotion ? 8 : 16;
     const particles = Array.from({ length: particleCount }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: (Math.random() - 0.5) * 0.4,
-      radius: Math.random() * 1.5 + 0.5,
-      alpha: Math.random() * 0.4 + 0.1,
+      vx: (Math.random() - 0.5) * 0.15,
+      vy: (Math.random() - 0.5) * 0.15,
+      radius: Math.random() * 1.2 + 0.6,
+      alpha: Math.random() * 0.25 + 0.05,
     }));
 
     const render = () => {
-      // Lerp mouse
-      mouse.x += (mouse.targetX - mouse.x) * 0.05;
-      mouse.y += (mouse.targetY - mouse.y) * 0.05;
+      mouse.x += (mouse.targetX - mouse.x) * 0.04;
+      mouse.y += (mouse.targetY - mouse.y) * 0.04;
 
       ctx.clearRect(0, 0, width, height);
 
-      // Draw subtle atmospheric radial light following mouse
+      // Subtle atmospheric illumination
       const gradient = ctx.createRadialGradient(
         mouse.x,
         mouse.y,
         0,
         mouse.x,
         mouse.y,
-        width * 0.45
+        width * 0.4
       );
-      gradient.addColorStop(0, "rgba(99, 102, 241, 0.045)");
-      gradient.addColorStop(0.5, "rgba(16, 185, 129, 0.015)");
+      gradient.addColorStop(0, "rgba(255, 255, 255, 0.025)");
+      gradient.addColorStop(0.6, "rgba(99, 102, 241, 0.012)");
       gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
 
-      // Connect subtle lines between nearby particles
+      // Soft particles
       for (let i = 0; i < particles.length; i++) {
-        const p1 = particles[i];
+        const p = particles[i];
         if (!reducedMotion) {
-          p1.x += p1.vx;
-          p1.y += p1.vy;
-          if (p1.x < 0 || p1.x > width) p1.vx *= -1;
-          if (p1.y < 0 || p1.y > height) p1.vy *= -1;
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0 || p.x > width) p.vx *= -1;
+          if (p.y < 0 || p.y > height) p.vy *= -1;
         }
 
         ctx.beginPath();
-        ctx.arc(p1.x, p1.y, p1.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${p1.alpha * 0.4})`;
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
         ctx.fill();
-
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          const dx = p1.x - p2.x;
-          const dy = p1.y - p2.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < 120) {
-            ctx.beginPath();
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(255, 255, 255, ${(1 - dist / 120) * 0.035})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        }
       }
 
       animationFrameId = requestAnimationFrame(render);
@@ -129,21 +110,20 @@ export const CinematicHero: React.FC = () => {
   return (
     <section
       id="hero"
-      className="relative min-h-screen w-full flex flex-col justify-between pt-32 pb-16 px-6 sm:px-8 md:px-12 lg:px-16 overflow-hidden select-none"
+      className="relative min-h-screen w-full flex flex-col justify-between pt-32 pb-16 px-6 sm:px-8 md:px-12 lg:px-16 overflow-hidden select-none bg-obsidian-950"
     >
-      {/* Background Interactive Ambient Canvas */}
+      {/* Background Calm Ambient Canvas */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 pointer-events-none z-0 opacity-70"
+        className="absolute inset-0 pointer-events-none z-0 opacity-60"
       />
 
       {/* Top Editorial Index */}
       <div className="relative z-10 max-w-7xl mx-auto w-full flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.06] pb-6">
-        <SectionLabel index="01" title="Financial Matrix" tag="AUG 2026 CYCLE" />
+        <SectionLabel index="01" title="Financial Matrix" tag="August 2026" />
         <div className="font-mono text-[11px] text-foreground-dim flex items-center gap-4">
-          <span>LATITUDE {"//"} FINANCIAL VELOCITY</span>
           <span className="text-financial-positive flex items-center gap-1">
-            <TrendingUp className="w-3 h-3" /> +{formatPercentage(savingsRate)} SAVINGS RATIO
+            <TrendingUp className="w-3 h-3" /> +{formatPercentage(savingsRate)} Savings velocity
           </span>
         </div>
       </div>
@@ -153,9 +133,9 @@ export const CinematicHero: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-end">
           {/* Headline Column */}
           <div className="lg:col-span-7 flex flex-col gap-6">
-            <div className="space-y-1">
-              <span className="font-mono text-xs text-foreground-muted tracking-widest uppercase block mb-2">
-                Digital Financial Intelligence
+            <div className="space-y-2">
+              <span className="font-mono text-xs text-foreground-muted tracking-widest uppercase block mb-1">
+                Financial Intelligence
               </span>
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extralight tracking-tightest text-foreground leading-[0.92]">
                 YOUR MONEY.
@@ -179,26 +159,21 @@ export const CinematicHero: React.FC = () => {
                   <Compass className="w-4 h-4" /> Explore Trajectory
                 </MagneticButton>
               </a>
-              <a href="#dashboard">
+              <a href="#universe">
                 <MagneticButton
                   variant="secondary"
                   size="lg"
-                  cursorLabel="INSPECT"
+                  cursorLabel="VIEW"
                 >
-                  Command Center
+                  Spending Universe
                 </MagneticButton>
               </a>
             </div>
           </div>
 
-          {/* Large Financial Rolling Display */}
+          {/* Large Financial Available Liquidity Display */}
           <div className="lg:col-span-5 flex flex-col items-start lg:items-end justify-end">
-            <div className="bg-obsidian-900/40 backdrop-blur-xl border border-white/[0.08] p-8 md:p-10 w-full max-w-md relative overflow-hidden group hover:border-white/[0.15] transition-all duration-500">
-              <div className="absolute top-0 right-0 p-3 font-mono text-[9px] text-foreground-dim uppercase tracking-widest flex items-center gap-1.5">
-                <ShieldCheck className="w-3 h-3 text-financial-positive" />
-                VERIFIED REALTIME
-              </div>
-
+            <div className="bg-obsidian-900/40 backdrop-blur-xl border border-white/[0.08] p-8 md:p-10 w-full max-w-md relative overflow-hidden transition-colors duration-500">
               <span className="font-mono text-xs tracking-mega uppercase text-foreground-muted block mb-3">
                 AVAILABLE LIQUIDITY
               </span>
@@ -236,12 +211,12 @@ export const CinematicHero: React.FC = () => {
 
       {/* Bottom Telemetry Scroll Indicator */}
       <div className="relative z-10 max-w-7xl mx-auto w-full flex items-center justify-between border-t border-white/[0.06] pt-6 font-mono text-[11px] text-foreground-dim">
-        <span className="hidden sm:inline">SCROLL TO UNPACK FINANCIAL LIFE</span>
+        <span className="hidden sm:inline">Scroll to explore financial trajectory</span>
         <a
           href="#story"
           className="flex items-center gap-2 text-foreground hover:text-financial-accent transition-colors duration-300 ml-auto sm:ml-0"
         >
-          <span>TRAJECTORY SEQUENCE</span>
+          <span>Trajectory Sequence</span>
           <ArrowDown className="w-3.5 h-3.5 animate-bounce" />
         </a>
       </div>

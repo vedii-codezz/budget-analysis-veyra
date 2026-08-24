@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useFinanceStore } from "@/store/finance";
 import { usePreferencesStore } from "@/store/preferences";
@@ -10,14 +10,11 @@ import { formatCurrency, formatPercentage } from "@/lib/utils/currency";
 import { TransactionCategory } from "@/types/finance";
 import {
   ArrowLeft,
-  ArrowUpRight,
   TrendingDown,
   TrendingUp,
-  Sparkles,
   ShoppingBag,
   Clock,
   Building2,
-  Compass,
 } from "lucide-react";
 import { clsx } from "clsx";
 
@@ -28,8 +25,8 @@ interface UniverseNode {
   color: string;
   x: number; // percentage in space
   y: number; // percentage in space
-  depth: number; // 0.8 - 1.2
-  trendVsLastMonth: number; // e.g. +12.4
+  depth: number;
+  trendVsLastMonth: number;
   txCount: number;
   largestTx: { title: string; amount: number; date: string };
   frequentMerchant: string;
@@ -55,11 +52,11 @@ export const SpendingUniverse: React.FC = () => {
 
   // Spatial node coordinates (balanced editorial constellation)
   const nodeLayout: Record<TransactionCategory, { x: number; y: number; depth: number }> = {
-    "Housing & Utilities": { x: 30, y: 35, depth: 1.15 },
-    "Investments & Savings": { x: 68, y: 32, depth: 1.1 },
-    "Food & Dining": { x: 48, y: 55, depth: 1.2 },
-    "Shopping & Lifestyle": { x: 26, y: 70, depth: 0.95 },
-    "Transport & Fuel": { x: 74, y: 65, depth: 0.9 },
+    "Housing & Utilities": { x: 30, y: 34, depth: 1.1 },
+    "Investments & Savings": { x: 68, y: 32, depth: 1.05 },
+    "Food & Dining": { x: 48, y: 54, depth: 1.15 },
+    "Shopping & Lifestyle": { x: 26, y: 68, depth: 0.95 },
+    "Transport & Fuel": { x: 74, y: 64, depth: 0.9 },
     "Entertainment & Leisure": { x: 56, y: 78, depth: 0.85 },
     "Subscriptions & SaaS": { x: 82, y: 44, depth: 0.8 },
     "Health & Wellness": { x: 18, y: 50, depth: 0.85 },
@@ -76,7 +73,6 @@ export const SpendingUniverse: React.FC = () => {
       date: "N/A",
     };
 
-    // Calculate most frequent merchant
     const merchantCounts: Record<string, number> = {};
     catTxs.forEach((t) => {
       merchantCounts[t.merchant] = (merchantCounts[t.merchant] || 0) + 1;
@@ -113,9 +109,8 @@ export const SpendingUniverse: React.FC = () => {
     };
   });
 
-  // Calculate size scale based on amount
-  const minSize = 90;
-  const maxSize = 210;
+  const minSize = 92;
+  const maxSize = 200;
   const maxSpend = Math.max(...nodes.map((n) => n.amount), 1);
 
   const getNodeSize = (amount: number) => {
@@ -123,13 +118,13 @@ export const SpendingUniverse: React.FC = () => {
     return Math.round(minSize + ratio * (maxSize - minSize));
   };
 
-  // Mouse move for subtle parallax depth
+  // Subtle parallax depth
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (reducedMotion || !containerRef.current) return;
+    if (reducedMotion || !containerRef.current || selectedCategory) return;
     const rect = containerRef.current.getBoundingClientRect();
     const x = (e.clientX - (rect.left + rect.width / 2)) / rect.width;
     const y = (e.clientY - (rect.top + rect.height / 2)) / rect.height;
-    setMouseOffset({ x: x * 20, y: y * 20 });
+    setMouseOffset({ x: x * 14, y: y * 14 });
   };
 
   const selectedNode = nodes.find((n) => n.category === selectedCategory);
@@ -137,22 +132,19 @@ export const SpendingUniverse: React.FC = () => {
   return (
     <section
       id="universe"
-      className="relative w-full py-24 md:py-36 px-6 sm:px-8 md:px-12 lg:px-16 overflow-hidden select-none bg-obsidian-950"
+      className="relative w-full py-24 md:py-36 px-6 sm:px-8 md:px-12 lg:px-16 overflow-hidden select-none bg-obsidian-950 border-t border-white/[0.06]"
     >
       <div className="max-w-7xl mx-auto space-y-12">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/[0.08] pb-8">
           <div>
-            <SectionLabel index="02" title="Spatial Topology" tag="THE SPENDING UNIVERSE" />
+            <SectionLabel index="03" title="Spatial Topology" tag="Spending Universe" />
             <h2 className="text-4xl md:text-5xl lg:text-7xl font-extralight tracking-tightest mt-3 text-foreground">
               SPENDING UNIVERSE.
             </h2>
           </div>
           <div className="flex items-center gap-4 text-xs font-mono text-foreground-dim">
-            <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-financial-accent animate-pulse" />
-              ORBITAL SCALE ∝ SPENDING MAGNITUDE
-            </span>
+            <span>Orbital scale reflects spending volume</span>
           </div>
         </div>
 
@@ -161,23 +153,22 @@ export const SpendingUniverse: React.FC = () => {
           ref={containerRef}
           onMouseMove={handleMouseMove}
           onMouseLeave={() => setMouseOffset({ x: 0, y: 0 })}
-          className="relative w-full h-[680px] md:h-[760px] bg-obsidian-900/30 border border-white/[0.06] rounded-none overflow-hidden"
+          className="relative w-full h-[640px] md:h-[720px] bg-obsidian-900/20 border border-white/[0.06] rounded-none overflow-hidden"
         >
           {/* Subtle Background Orbital Ring Aesthetics */}
-          <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-20">
-            <div className="w-[600px] h-[600px] rounded-full border border-white/[0.04]" />
-            <div className="absolute w-[900px] h-[900px] rounded-full border border-white/[0.03] border-dashed" />
-            <div className="absolute w-[300px] h-[300px] rounded-full border border-white/[0.06]" />
+          <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-10">
+            <div className="w-[500px] h-[500px] rounded-full border border-white/[0.05]" />
+            <div className="absolute w-[800px] h-[800px] rounded-full border border-white/[0.03] border-dashed" />
           </div>
 
-          {/* Regular Constellation State (When No Node is Deep-Dived) */}
+          {/* Regular Constellation State */}
           <AnimatePresence>
             {!selectedCategory && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.4 }}
                 className="absolute inset-0"
               >
                 {nodes.map((node) => {
@@ -188,7 +179,6 @@ export const SpendingUniverse: React.FC = () => {
                       ? (node.amount / totalMonthlySpend) * 100
                       : 0;
 
-                  // Parallax displacement based on depth
                   const parallaxX = mouseOffset.x * node.depth;
                   const parallaxY = mouseOffset.y * node.depth;
 
@@ -202,16 +192,16 @@ export const SpendingUniverse: React.FC = () => {
                       animate={{
                         x: parallaxX,
                         y: parallaxY,
-                        scale: isHovered ? 1.06 : 1,
+                        scale: isHovered ? 1.05 : 1,
                       }}
                       transition={{
                         type: "spring",
-                        stiffness: 260,
-                        damping: 24,
+                        stiffness: 240,
+                        damping: 26,
                       }}
                       onMouseEnter={() => {
                         setHoveredCategory(node.category);
-                        setCursorContext({ variant: "explore", label: "OPEN" });
+                        setCursorContext({ variant: "explore", label: "EXPLORE" });
                       }}
                       onMouseLeave={() => {
                         setHoveredCategory(null);
@@ -229,41 +219,35 @@ export const SpendingUniverse: React.FC = () => {
                           width: `${size}px`,
                           height: `${size}px`,
                         }}
-                        className="relative rounded-full flex flex-col items-center justify-center p-4 text-center transition-all duration-700 bg-obsidian-900/80 backdrop-blur-xl border border-white/10 group-hover:border-white/30 shadow-2xl"
+                        className="relative rounded-full flex flex-col items-center justify-center p-3 text-center transition-all duration-500 bg-obsidian-900/90 backdrop-blur-md border border-white/10 group-hover:border-white/30 shadow-xl"
                       >
-                        {/* Atmospheric Glow */}
+                        {/* Controlled Ambient Glow on Hover */}
                         <div
-                          className="absolute inset-0 rounded-full blur-xl opacity-20 group-hover:opacity-45 transition-opacity duration-500 pointer-events-none"
+                          className={clsx(
+                            "absolute inset-0 rounded-full blur-xl pointer-events-none transition-opacity duration-300",
+                            isHovered ? "opacity-35" : "opacity-0"
+                          )}
                           style={{ backgroundColor: node.color }}
                         />
 
-                        {/* Subtle Inner Ring */}
-                        <div
-                          className="absolute inset-2 rounded-full border opacity-20 group-hover:opacity-40 transition-opacity"
-                          style={{ borderColor: node.color }}
-                        />
-
-                        {/* Content */}
+                        {/* Clean Progressive Content */}
                         <span className="font-mono text-[10px] sm:text-[11px] tracking-wider uppercase text-foreground-muted group-hover:text-foreground transition-colors line-clamp-1">
                           {node.category.split(" & ")[0]}
                         </span>
                         <span className="text-sm sm:text-base md:text-lg font-light text-foreground tracking-tight tabular-nums mt-0.5">
                           {formatCurrency(node.amount, { compact: true })}
                         </span>
-                        <span className="font-mono text-[9px] text-foreground-dim mt-0.5">
-                          {formatPercentage(pctOfTotal, 0)}
-                        </span>
                       </div>
 
-                      {/* Tooltip on Hover */}
+                      {/* Tooltip on Hover (Progressive Disclosure) */}
                       <AnimatePresence>
                         {isHovered && (
                           <motion.div
-                            initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                            initial={{ opacity: 0, y: 6, scale: 0.96 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 4, scale: 0.95 }}
-                            transition={{ duration: 0.18 }}
-                            className="absolute top-full left-1/2 -translate-x-1/2 mt-3 z-30 bg-obsidian-950 border border-white/15 px-4 py-2.5 shadow-2xl font-mono text-[11px] whitespace-nowrap space-y-1"
+                            exit={{ opacity: 0, y: 4, scale: 0.96 }}
+                            transition={{ duration: 0.15 }}
+                            className="absolute top-full left-1/2 -translate-x-1/2 mt-2.5 z-30 bg-obsidian-950 border border-white/15 px-3.5 py-2 shadow-2xl font-mono text-[11px] whitespace-nowrap space-y-1"
                           >
                             <div className="flex items-center justify-between gap-4">
                               <span className="text-foreground font-medium">{node.category}</span>
@@ -272,7 +256,7 @@ export const SpendingUniverse: React.FC = () => {
                               </span>
                             </div>
                             <div className="flex items-center gap-3 text-foreground-dim text-[10px]">
-                              <span>{formatPercentage(pctOfTotal)} OF SPENDING</span>
+                              <span>{formatPercentage(pctOfTotal)} of total</span>
                               <span
                                 className={clsx(
                                   "flex items-center gap-0.5",
@@ -286,7 +270,7 @@ export const SpendingUniverse: React.FC = () => {
                                 ) : (
                                   <TrendingDown className="w-2.5 h-2.5" />
                                 )}
-                                {Math.abs(node.trendVsLastMonth)}% VS LAST MONTH
+                                {Math.abs(node.trendVsLastMonth)}% vs last month
                               </span>
                             </div>
                           </motion.div>
@@ -306,7 +290,7 @@ export const SpendingUniverse: React.FC = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.4 }}
+                transition={{ duration: 0.35 }}
                 className="absolute inset-0 z-20 flex flex-col justify-between p-6 sm:p-10 md:p-14 bg-obsidian-950/95 backdrop-blur-2xl"
               >
                 {/* Deep Dive Header & Back Trigger */}
@@ -316,27 +300,27 @@ export const SpendingUniverse: React.FC = () => {
                     className="flex items-center gap-2 font-mono text-xs text-foreground-muted hover:text-foreground uppercase tracking-wider transition-colors group"
                   >
                     <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-                    <span>Return to Spending Universe</span>
+                    <span>Return to Universe</span>
                   </button>
                   <div className="font-mono text-xs text-foreground-dim uppercase">
-                    ANALYSIS // {selectedNode.category}
+                    {selectedNode.category}
                   </div>
                 </div>
 
                 {/* Main Asymmetric Deep Dive Layout */}
                 <div className="my-auto py-6 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                  {/* Left Anchor Orb Visualization */}
+                  {/* Primary Category Total */}
                   <div className="lg:col-span-4 flex flex-col items-center justify-center">
                     <div
                       style={{ borderColor: selectedNode.color }}
-                      className="w-56 h-56 md:w-64 md:h-64 rounded-full border-2 bg-obsidian-900/90 flex flex-col items-center justify-center p-6 text-center relative shadow-2xl shadow-black"
+                      className="w-52 h-52 md:w-60 md:h-60 rounded-full border bg-obsidian-900/90 flex flex-col items-center justify-center p-6 text-center relative shadow-2xl"
                     >
                       <div
-                        className="absolute inset-0 rounded-full blur-2xl opacity-20 pointer-events-none"
+                        className="absolute inset-0 rounded-full blur-xl opacity-15 pointer-events-none"
                         style={{ backgroundColor: selectedNode.color }}
                       />
                       <span className="font-mono text-xs uppercase tracking-widest text-foreground-muted">
-                        TOTAL DEPLOYED
+                        Category Total
                       </span>
                       <span className="text-3xl md:text-4xl font-light text-foreground tracking-tight tabular-nums my-1">
                         {formatCurrency(selectedNode.amount)}
@@ -347,12 +331,12 @@ export const SpendingUniverse: React.FC = () => {
                             ? (selectedNode.amount / totalMonthlySpend) * 100
                             : 0
                         )}{" "}
-                        OF TOTAL SPEND
+                        of spend
                       </span>
                     </div>
                   </div>
 
-                  {/* Right Analytical Breakdown */}
+                  {/* Supporting Analytical Breakdown */}
                   <div className="lg:col-span-8 space-y-6">
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 border-b border-white/[0.06] pb-6">
                       <div>
@@ -406,9 +390,9 @@ export const SpendingUniverse: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Contextual Intelligence Row */}
+                    {/* Contextual Data Row */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 font-mono text-xs">
-                      <div className="bg-obsidian-900/60 p-4 border border-white/[0.06] space-y-1">
+                      <div className="bg-obsidian-900/40 p-4 border border-white/[0.06] space-y-1">
                         <span className="text-[10px] text-foreground-dim uppercase flex items-center gap-1.5">
                           <ShoppingBag className="w-3 h-3 text-foreground-muted" /> Largest Outflow
                         </span>
@@ -420,24 +404,24 @@ export const SpendingUniverse: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="bg-obsidian-900/60 p-4 border border-white/[0.06] space-y-1">
+                      <div className="bg-obsidian-900/40 p-4 border border-white/[0.06] space-y-1">
                         <span className="text-[10px] text-foreground-dim uppercase flex items-center gap-1.5">
                           <Building2 className="w-3 h-3 text-foreground-muted" /> Frequent Merchant
                         </span>
                         <div className="text-foreground font-medium truncate">
                           {selectedNode.frequentMerchant}
                         </div>
-                        <div className="text-foreground-muted">Top recurring vendor</div>
+                        <div className="text-foreground-muted text-[11px]">Top recurring vendor</div>
                       </div>
 
-                      <div className="bg-obsidian-900/60 p-4 border border-white/[0.06] space-y-1">
+                      <div className="bg-obsidian-900/40 p-4 border border-white/[0.06] space-y-1">
                         <span className="text-[10px] text-foreground-dim uppercase flex items-center gap-1.5">
                           <Clock className="w-3 h-3 text-foreground-muted" /> High Velocity Peak
                         </span>
                         <div className="text-foreground font-medium">
                           {selectedNode.peakDay}
                         </div>
-                        <div className="text-foreground-muted">Highest daily spend</div>
+                        <div className="text-foreground-muted text-[11px]">Highest daily spend</div>
                       </div>
                     </div>
                   </div>
@@ -445,12 +429,12 @@ export const SpendingUniverse: React.FC = () => {
 
                 {/* Deep Dive Footer */}
                 <div className="flex items-center justify-between border-t border-white/[0.08] pt-4 font-mono text-[11px] text-foreground-dim">
-                  <span>DISCIPLINE: {Math.round((selectedNode.amount / selectedNode.allocated) * 100)}% ALLOCATED</span>
+                  <span>Discipline: {Math.round((selectedNode.amount / selectedNode.allocated) * 100)}% allocated</span>
                   <button
                     onClick={() => setSelectedCategory(null)}
                     className="text-foreground hover:text-financial-accent transition-colors"
                   >
-                    [CLOSE ANALYSIS]
+                    [Close Analysis]
                   </button>
                 </div>
               </motion.div>

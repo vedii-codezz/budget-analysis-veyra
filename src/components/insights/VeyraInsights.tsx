@@ -4,15 +4,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { registerGSAP } from "@/lib/animation/gsap";
 import { usePreferencesStore } from "@/store/preferences";
 import { SectionLabel } from "@/components/ui/SectionLabel";
-import { formatCurrency, formatPercentage } from "@/lib/utils/currency";
-import {
-  TrendingUp,
-  Flame,
-  Calendar,
-  Layers,
-  ChevronRight,
-  Sparkles,
-} from "lucide-react";
 import { clsx } from "clsx";
 
 interface InsightItem {
@@ -20,45 +11,40 @@ interface InsightItem {
   tag: string;
   headline: string;
   caption: string;
-  impactLevel: "high" | "medium" | "neutral";
   evidenceType: "weekend" | "micro" | "forecast" | "recurring";
 }
 
 const INSIGHTS: InsightItem[] = [
   {
     id: "ins-1",
-    tag: "SPENDING PATTERN // 04",
+    tag: "Spending Pattern // 04",
     headline: "YOUR WEEKENDS COST 31% MORE.",
     caption:
       "Saturday & Sunday discretionary outflows averaged ₹2,420 compared to ₹1,080 on regular weekdays.",
-    impactLevel: "high",
     evidenceType: "weekend",
   },
   {
     id: "ins-2",
-    tag: "MICRO-OUTFLOWS // 05",
+    tag: "Micro-Outflows // 05",
     headline: "₹3,840 DISAPPEARED IN PURCHASES UNDER ₹300.",
     caption:
       "14 instant-delivery and specialty coffee runs accumulated into 6.5% of your total monthly expenditure.",
-    impactLevel: "medium",
     evidenceType: "micro",
   },
   {
     id: "ins-3",
-    tag: "BUDGET PACING // 02",
+    tag: "Budget Pacing // 02",
     headline: "AT THIS RATE, FOOD WILL CROSS ITS BUDGET BY AUG 27.",
     caption:
       "Current dining velocity of ₹372/day projects an overburn of ₹1,480 beyond the ₹12,000 allocation cap.",
-    impactLevel: "high",
     evidenceType: "forecast",
   },
   {
     id: "ins-4",
-    tag: "RECURRING CAPITAL // 01",
+    tag: "Recurring Capital // 01",
     headline: "3 SAAS COMMITMENTS DEPLOY ₹2,490 EVERY MONTH.",
     caption:
-      "Cloud developer tools, Apple One, and streaming services maintain automated zero-friction deductions.",
-    impactLevel: "neutral",
+      "Cloud developer tools, Apple One, and streaming services maintain automated recurring deductions.",
     evidenceType: "recurring",
   },
 ];
@@ -82,7 +68,7 @@ export const VeyraInsights: React.FC = () => {
       ScrollTrigger.create({
         trigger: triggerEl,
         start: "top top",
-        end: "+=280%",
+        end: "+=260%",
         pin: true,
         scrub: 0.6,
         onUpdate: (self) => {
@@ -116,9 +102,9 @@ export const VeyraInsights: React.FC = () => {
         {/* Section Top Header */}
         <div className="max-w-7xl mx-auto w-full flex items-center justify-between border-b border-white/[0.08] pb-6">
           <SectionLabel
-            index="04"
+            index="06"
             title="Behavioral Intelligence"
-            tag="WHAT YOUR MONEY IS TELLING YOU"
+            tag="Veyra Insights"
           />
           <div className="flex items-center gap-2 font-mono text-xs text-foreground-dim">
             <span className="text-foreground font-semibold">0{activeInsightIndex + 1}</span>
@@ -132,10 +118,9 @@ export const VeyraInsights: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             {/* Left Dominant Statement */}
             <div className="lg:col-span-8 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 font-mono text-[10px] tracking-mega uppercase bg-white/[0.03] border border-white/[0.08] text-financial-accent">
-                <Sparkles className="w-3 h-3" />
+              <span className="font-mono text-xs tracking-mega uppercase text-financial-accent block">
                 {current.tag}
-              </div>
+              </span>
 
               <h2 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extralight tracking-tightest uppercase text-foreground leading-[0.92] transition-all duration-500">
                 {current.headline}
@@ -146,92 +131,72 @@ export const VeyraInsights: React.FC = () => {
               </p>
             </div>
 
-            {/* Right Understated Contextual Evidence Card */}
+            {/* Right Understated Contextual Evidence */}
             <div className="lg:col-span-4 flex flex-col justify-center">
-              <div className="bg-obsidian-900/70 backdrop-blur-2xl border border-white/[0.09] p-6 sm:p-8 space-y-6 shadow-2xl">
-                <div className="flex items-center justify-between border-b border-white/[0.06] pb-4 font-mono text-xs">
-                  <span className="text-foreground-dim uppercase tracking-wider">
-                    EVIDENCE PROOF
-                  </span>
-                  <span
-                    className={clsx(
-                      "text-[10px] uppercase font-semibold px-2 py-0.5",
-                      current.impactLevel === "high"
-                        ? "bg-financial-warning/20 text-financial-warning"
-                        : "bg-white/[0.05] text-foreground-muted"
-                    )}
-                  >
-                    {current.impactLevel} ATTENTION
-                  </span>
-                </div>
+              <div className="bg-obsidian-900/50 backdrop-blur-xl border border-white/[0.08] p-6 sm:p-8 space-y-6">
+                <span className="font-mono text-xs text-foreground-dim uppercase tracking-wider block border-b border-white/[0.06] pb-3">
+                  Evidence Proof
+                </span>
 
-                {/* Evidence Visualizations */}
                 {current.evidenceType === "weekend" && (
                   <div className="space-y-4 font-mono text-xs">
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-foreground-muted">
-                        <span>Weekend Daily Average</span>
+                        <span>Weekend Average</span>
                         <span className="text-financial-warning font-semibold">₹2,420</span>
                       </div>
-                      <div className="w-full h-2 bg-obsidian-800">
+                      <div className="w-full h-1.5 bg-obsidian-800">
                         <div className="w-[85%] h-full bg-financial-warning" />
                       </div>
                     </div>
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-foreground-muted">
-                        <span>Weekday Daily Average</span>
-                        <span className="text-foreground font-semibold">₹1,080</span>
+                        <span>Weekday Average</span>
+                        <span className="text-foreground">₹1,080</span>
                       </div>
-                      <div className="w-full h-2 bg-obsidian-800">
+                      <div className="w-full h-1.5 bg-obsidian-800">
                         <div className="w-[42%] h-full bg-financial-positive" />
                       </div>
-                    </div>
-                    <div className="text-[10px] text-foreground-dim pt-2 border-t border-white/[0.04]">
-                      +₹1,340 average surge on Saturdays & Sundays
                     </div>
                   </div>
                 )}
 
                 {current.evidenceType === "micro" && (
-                  <div className="space-y-4 font-mono text-xs">
+                  <div className="space-y-3 font-mono text-xs">
                     <div className="flex items-center justify-between">
                       <span className="text-foreground-muted">14 Micro Purchases</span>
                       <span className="text-foreground font-semibold">₹3,840 Total</span>
                     </div>
-                    <div className="grid grid-cols-7 gap-1.5 py-2">
+                    <div className="grid grid-cols-7 gap-1 py-1">
                       {Array.from({ length: 14 }).map((_, i) => (
                         <div
                           key={i}
-                          className="h-6 bg-financial-accent/30 border border-financial-accent/40 rounded-none flex items-center justify-center text-[9px] text-financial-accent"
+                          className="h-5 bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-[8px] text-foreground-dim"
                         >
                           ₹
                         </div>
                       ))}
                     </div>
-                    <div className="text-[10px] text-foreground-dim border-t border-white/[0.04] pt-2">
-                      6.5% of monthly capital vanished in micro transactions
-                    </div>
                   </div>
                 )}
 
                 {current.evidenceType === "forecast" && (
-                  <div className="space-y-4 font-mono text-xs">
+                  <div className="space-y-3 font-mono text-xs">
                     <div className="flex justify-between">
-                      <span className="text-foreground-muted">Burn Rate</span>
+                      <span className="text-foreground-muted">Current Burn</span>
                       <span className="text-financial-danger font-semibold">₹372 / day</span>
                     </div>
-                    <div className="w-full h-2 bg-obsidian-800 overflow-hidden">
+                    <div className="w-full h-1.5 bg-obsidian-800 overflow-hidden">
                       <div className="w-[92%] h-full bg-financial-danger" />
                     </div>
-                    <div className="flex justify-between text-[10px] text-foreground-dim pt-2 border-t border-white/[0.04]">
-                      <span>Projected Breach: AUG 27</span>
-                      <span className="text-financial-danger">+₹1,480 Over Cap</span>
+                    <div className="text-[10px] text-financial-danger pt-1">
+                      Pacing +₹1,480 beyond monthly cap
                     </div>
                   </div>
                 )}
 
                 {current.evidenceType === "recurring" && (
-                  <div className="space-y-3 font-mono text-xs">
+                  <div className="space-y-2.5 font-mono text-xs">
                     <div className="flex justify-between text-foreground-muted">
                       <span>Anthropic Claude Pro</span>
                       <span className="text-foreground">₹1,750</span>
@@ -244,9 +209,6 @@ export const VeyraInsights: React.FC = () => {
                       <span>Spotify & YouTube</span>
                       <span className="text-foreground">₹375</span>
                     </div>
-                    <div className="text-[10px] text-financial-positive pt-2 border-t border-white/[0.04]">
-                      All subscriptions optimized and active
-                    </div>
                   </div>
                 )}
               </div>
@@ -254,7 +216,7 @@ export const VeyraInsights: React.FC = () => {
           </div>
         </div>
 
-        {/* Section Bottom Interactive Stepper */}
+        {/* Section Bottom Stepper */}
         <div className="max-w-7xl mx-auto w-full flex items-center justify-between border-t border-white/[0.06] pt-6 font-mono text-[11px] text-foreground-dim">
           <div className="flex items-center gap-4 sm:gap-6 overflow-x-auto">
             {INSIGHTS.map((item, idx) => (
@@ -274,11 +236,11 @@ export const VeyraInsights: React.FC = () => {
                     activeInsightIndex === idx ? "bg-financial-accent" : "bg-obsidian-700"
                   )}
                 />
-                <span>0{idx + 1} {item.headline.slice(0, 16)}...</span>
+                <span>0{idx + 1}</span>
               </button>
             ))}
           </div>
-          <span className="hidden sm:inline text-[10px]">SCROLL TO PROGRESS</span>
+          <span className="hidden sm:inline text-[10px]">Scroll to progress</span>
         </div>
       </div>
     </div>

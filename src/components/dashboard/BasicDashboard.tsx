@@ -9,17 +9,10 @@ import { GlassPanel } from "@/components/ui/GlassPanel";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { formatCurrency, formatPercentage } from "@/lib/utils/currency";
 import {
-  ArrowUpRight,
-  Filter,
   Plus,
   ReceiptText,
-  SlidersHorizontal,
-  TrendingDown,
-  TrendingUp,
-  Wallet,
   Play,
-  Calendar,
-  Sparkles,
+  ArrowRight,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { TransactionCategory } from "@/types/finance";
@@ -92,25 +85,16 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
       id="dashboard"
       className="relative w-full py-24 md:py-36 px-6 sm:px-8 md:px-12 lg:px-16 bg-obsidian-950 text-foreground border-t border-white/[0.06]"
     >
-      <div className="max-w-7xl mx-auto space-y-20">
+      <div className="max-w-7xl mx-auto space-y-24">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/[0.08] pb-8">
           <div>
-            <SectionLabel index="06" title="Executive Command Center" tag="COMMAND & LEDGER" />
+            <SectionLabel index="07" title="Executive Ledger" tag="Command Center" />
             <h2 className="text-4xl md:text-5xl lg:text-7xl font-extralight tracking-tightest mt-3 text-foreground">
               FINANCIAL COMMAND.
             </h2>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-            {onOpenStory && (
-              <MagneticButton
-                variant="secondary"
-                onClick={onOpenStory}
-                cursorLabel="STORY"
-              >
-                <Play className="w-3.5 h-3.5 text-financial-accent" /> Launch VEYRA Story
-              </MagneticButton>
-            )}
+          <div className="flex items-center gap-3">
             <MagneticButton
               variant="primary"
               onClick={() => setIsAddModalOpen(true)}
@@ -127,7 +111,7 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
           <div className="lg:col-span-7 space-y-8">
             <div className="border-l-2 border-foreground/30 pl-6 space-y-2">
               <span className="font-mono text-xs uppercase tracking-mega text-foreground-muted">
-                NET AUGUST CAPITAL PRESERVATION
+                NET CAPITAL PRESERVATION
               </span>
               <div className="py-1">
                 <DisplayNumber amount={savings} size="hero" status="positive" />
@@ -166,18 +150,18 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
                 statusColor="emerald"
                 change={health.tier}
                 trend="up"
-                caption={health.summary.slice(0, 24) + "..."}
+                caption="Active health status"
               />
             </div>
           </div>
 
-          {/* Right Column: Timeline Scrubbing & Month Pace */}
+          {/* Right Column: Timeline Scrubbing */}
           <div className="lg:col-span-5 space-y-6">
             <GlassPanel variant="default" className="p-8 space-y-6">
               <div className="flex items-center justify-between border-b border-white/[0.06] pb-4 font-mono text-xs text-foreground-muted uppercase tracking-wider">
-                <span>CUMULATIVE PACE SCRUBBER</span>
-                <span className="text-financial-accent font-semibold">
-                  AUG {scrubDay < 10 ? `0${scrubDay}` : scrubDay}
+                <span>Pace Scrubber</span>
+                <span className="text-financial-accent font-medium">
+                  Aug {scrubDay < 10 ? `0${scrubDay}` : scrubDay}
                 </span>
               </div>
 
@@ -191,20 +175,19 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
                   </span>
                 </div>
 
-                {/* Range Slider for Date Scrubbing */}
                 <input
                   type="range"
                   min="1"
                   max="31"
                   value={scrubDay}
                   onChange={(e) => setScrubDay(Number(e.target.value))}
-                  className="w-full h-1.5 bg-obsidian-700 accent-financial-accent cursor-pointer"
+                  className="w-full h-1.5 bg-obsidian-700 accent-foreground cursor-pointer"
                 />
 
                 <div className="flex justify-between font-mono text-[10px] text-foreground-dim uppercase">
-                  <span>AUG 01</span>
-                  <span>AUG 15</span>
-                  <span>AUG 31</span>
+                  <span>Aug 01</span>
+                  <span>Aug 15</span>
+                  <span>Aug 31</span>
                 </div>
               </div>
 
@@ -215,14 +198,14 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
           </div>
         </div>
 
-        {/* Category Budget Allocation (Asymmetrical Pressure Visualization) */}
+        {/* Category Budget Allocation */}
         <div className="space-y-6 pt-12 border-t border-white/[0.08]">
           <div className="flex items-center justify-between">
             <span className="font-mono text-xs uppercase tracking-mega text-foreground-muted">
-              BUDGET PRESSURE ARCHITECTURE
+              BUDGET ALLOCATION ADHERENCE
             </span>
             <span className="font-mono text-xs text-foreground-dim">
-              {budgets.length} ACTIVE CAPS MONITORED
+              {budgets.length} monitored categories
             </span>
           </div>
 
@@ -230,7 +213,7 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
             {budgetUsage.map((b) => (
               <div key={b.category} className="space-y-2 group">
                 <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-foreground group-hover:text-financial-accent transition-colors">
+                  <span className="text-foreground group-hover:text-foreground-muted transition-colors">
                     {b.category}
                   </span>
                   <div className="flex items-center gap-3">
@@ -251,11 +234,10 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
                     </span>
                   </div>
                 </div>
-                {/* Multi-stage Tension Bar */}
-                <div className="w-full h-1.5 bg-obsidian-800 overflow-hidden">
+                <div className="w-full h-1 bg-obsidian-800 overflow-hidden">
                   <div
                     className={clsx(
-                      "h-full transition-all duration-700",
+                      "h-full transition-all duration-500",
                       b.status === "exceeded"
                         ? "bg-financial-danger"
                         : b.status === "warning"
@@ -270,7 +252,7 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
           </div>
         </div>
 
-        {/* Cinematic Transaction Ledger with Focus Hovering */}
+        {/* Transaction Ledger Table (Calm & Readable) */}
         <div className="space-y-6 pt-12 border-t border-white/[0.08]">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -288,7 +270,7 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
                     key={cat}
                     onClick={() => setSelectedCategoryFilter(cat)}
                     className={clsx(
-                      "px-3 py-1 border whitespace-nowrap transition-colors duration-200",
+                      "px-3 py-1 border whitespace-nowrap transition-colors duration-150",
                       selectedCategoryFilter === cat
                         ? "border-foreground bg-foreground text-background font-medium"
                         : "border-white/[0.08] text-foreground-muted hover:text-foreground"
@@ -301,7 +283,7 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
             </div>
           </div>
 
-          {/* Ledger Table with Hover Focus */}
+          {/* Ledger Table */}
           <div className="border border-white/[0.06] overflow-hidden">
             <div className="divide-y divide-white/[0.04]">
               {filteredTransactions.map((tx) => {
@@ -314,11 +296,11 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
                     onMouseEnter={() => setHoveredTxId(tx.id)}
                     onMouseLeave={() => setHoveredTxId(null)}
                     className={clsx(
-                      "flex flex-col sm:flex-row sm:items-center justify-between p-4 md:px-6 transition-all duration-300 gap-2 font-mono text-xs",
+                      "flex flex-col sm:flex-row sm:items-center justify-between p-4 md:px-6 transition-all duration-200 gap-2 font-mono text-xs",
                       isHovered
-                        ? "bg-white/[0.05] border-l-2 border-financial-accent pl-4 md:pl-5"
+                        ? "bg-white/[0.04] pl-4 md:pl-5"
                         : hasHover
-                        ? "opacity-40"
+                        ? "opacity-50"
                         : "hover:bg-white/[0.02]"
                     )}
                   >
@@ -334,7 +316,7 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
                       <span className="text-[10px] px-2 py-0.5 border border-white/[0.06] text-foreground-dim">
                         {tx.category}
                       </span>
-                      <span className="text-foreground font-semibold text-sm tabular-nums">
+                      <span className="text-foreground font-medium text-sm tabular-nums">
                         -₹{tx.amount.toLocaleString("en-IN")}
                       </span>
                     </div>
@@ -344,6 +326,28 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
             </div>
           </div>
         </div>
+
+        {/* Visual Decompression & VEYRA Story Invitation (Directive #29) */}
+        {onOpenStory && (
+          <div className="pt-20 pb-8 text-center space-y-6 border-t border-white/[0.06]">
+            <span className="font-mono text-xs tracking-mega uppercase text-foreground-dim block">
+              YOUR MONTH HAS A STORY.
+            </span>
+            <h3 className="text-4xl sm:text-5xl md:text-6xl font-extralight tracking-tightest uppercase text-foreground">
+              SEE IT.
+            </h3>
+            <div className="pt-2">
+              <MagneticButton
+                variant="primary"
+                size="lg"
+                onClick={onOpenStory}
+                cursorLabel="ENTER"
+              >
+                <Play className="w-4 h-4 text-background fill-background" /> Enter VEYRA Story
+              </MagneticButton>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Add Transaction Modal */}
@@ -371,7 +375,7 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
                   placeholder="e.g. Flight to Mumbai"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full bg-obsidian-950 border border-white/[0.1] px-3.5 py-2.5 text-foreground focus:border-financial-accent focus:outline-none"
+                  className="w-full bg-obsidian-950 border border-white/[0.1] px-3.5 py-2.5 text-foreground focus:border-foreground focus:outline-none"
                 />
               </div>
 
@@ -382,7 +386,7 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
                   placeholder="e.g. Air India"
                   value={newMerchant}
                   onChange={(e) => setNewMerchant(e.target.value)}
-                  className="w-full bg-obsidian-950 border border-white/[0.1] px-3.5 py-2.5 text-foreground focus:border-financial-accent focus:outline-none"
+                  className="w-full bg-obsidian-950 border border-white/[0.1] px-3.5 py-2.5 text-foreground focus:border-foreground focus:outline-none"
                 />
               </div>
 
@@ -394,7 +398,7 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
                   placeholder="e.g. 6420"
                   value={newAmount}
                   onChange={(e) => setNewAmount(e.target.value)}
-                  className="w-full bg-obsidian-950 border border-white/[0.1] px-3.5 py-2.5 text-foreground focus:border-financial-accent focus:outline-none"
+                  className="w-full bg-obsidian-950 border border-white/[0.1] px-3.5 py-2.5 text-foreground focus:border-foreground focus:outline-none"
                 />
               </div>
 
@@ -403,7 +407,7 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
                 <select
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value as TransactionCategory)}
-                  className="w-full bg-obsidian-950 border border-white/[0.1] px-3.5 py-2.5 text-foreground focus:border-financial-accent focus:outline-none"
+                  className="w-full bg-obsidian-950 border border-white/[0.1] px-3.5 py-2.5 text-foreground focus:border-foreground focus:outline-none"
                 >
                   {budgets.map((b) => (
                     <option key={b.category} value={b.category}>
