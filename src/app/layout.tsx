@@ -17,9 +17,17 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AETHER // Cinematic Financial Intelligence",
+  title: "VEYRA — Your Money, In Focus",
   description:
-    "An editorial, high-precision personal budget analysis and financial command center.",
+    "A cinematic personal finance and budget analysis experience for understanding spending, cash flow, savings and financial behaviour.",
+  applicationName: "VEYRA",
+  openGraph: {
+    title: "VEYRA — Your Money, In Focus",
+    description:
+      "A cinematic personal finance and budget analysis experience for understanding spending, cash flow, savings and financial behaviour.",
+    siteName: "VEYRA",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

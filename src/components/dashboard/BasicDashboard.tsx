@@ -134,7 +134,7 @@ export const BasicDashboard: React.FC = () => {
                 caption="August cumulative"
               />
               <FinancialMetric
-                label="Health Index"
+                label="VEYRA SCORE"
                 value={`${health.score}/100`}
                 isCurrency={false}
                 statusColor="emerald"
@@ -149,7 +149,7 @@ export const BasicDashboard: React.FC = () => {
           <div className="lg:col-span-5 space-y-6">
             <GlassPanel variant="default" className="p-8 space-y-6">
               <div className="flex items-center justify-between border-b border-white/[0.06] pb-4 font-mono text-xs text-foreground-muted uppercase tracking-wider">
-                <span>SYSTEM HEALTH AUDIT</span>
+                <span>VEYRA SCORE AUDIT</span>
                 <span className="text-financial-positive font-semibold">
                   {health.tier}
                 </span>

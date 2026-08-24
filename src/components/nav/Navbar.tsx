@@ -63,7 +63,7 @@ export const Navbar: React.FC = () => {
           <div className="w-2 h-2 rounded-none bg-foreground transition-transform duration-500 group-hover:rotate-45" />
           <div className="flex flex-col">
             <span className="font-mono text-xs tracking-widest text-foreground font-semibold">
-              AETHER<span className="text-foreground-dim font-normal">{" // 01"}</span>
+              VEYRA<span className="text-foreground-dim font-normal">{" // 01"}</span>
             </span>
             <span className="text-[9px] font-mono text-foreground-dim uppercase tracking-wider hidden sm:inline">
               Financial Intelligence

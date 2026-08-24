@@ -1,11 +1,13 @@
-# AETHER // Cinematic Budget Analysis & Financial Command Center
+# VEYRA
 
-A luxury dark-aesthetic, editorial personal budget analysis web application inspired by the design philosophy of **CRED** and **TerraSight**.
+**Your money, in focus.**
+
+> VEYRA is an immersive personal finance and budget analysis platform that transforms financial data into an interactive visual experience. It helps users understand spending patterns, monitor budgets, explore cash flow, track savings, and discover actionable financial insights.
 
 ## Key Features
 
 - **Cinematic Experience:** Atmospheric obsidian aesthetic (`#050505`), subtle film grain, and editorial typography hierarchy.
-- **Pure Financial Calculation Engine:** Decoupled mathematical modules for savings rates, burn pace, category budgeting, and composite financial health indexing.
+- **Pure Financial Calculation Engine:** Decoupled mathematical modules for savings rates, burn pace, category budgeting, and composite VEYRA SCORE health indexing.
 - **Scroll-Driven Financial Storytelling:** GSAP ScrollTrigger pinned narrative (`YOU EARNED` → `YOU SPENT` → `YOU SAVED` → `SAVINGS RATE`).
 - **Interactive Command Center:** Asymmetric macro overview, category allocation adherence, and capital deployment ledger with live transaction recording.
 - **Centralized Animation Pipeline:** Coordinated GSAP and Framer Motion integration with Lenis smooth scrolling.
