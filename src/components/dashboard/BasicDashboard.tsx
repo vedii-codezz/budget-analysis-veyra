@@ -17,13 +17,22 @@ import {
   TrendingDown,
   TrendingUp,
   Wallet,
+  Play,
+  Calendar,
+  Sparkles,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { TransactionCategory } from "@/types/finance";
 
-export const BasicDashboard: React.FC = () => {
+interface BasicDashboardProps {
+  onOpenStory?: () => void;
+}
+
+export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) => {
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>("ALL");
+  const [hoveredTxId, setHoveredTxId] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [scrubDay, setScrubDay] = useState<number>(24);
 
   // Form State for quick transaction addition
   const [newTitle, setNewTitle] = useState("");
@@ -65,6 +74,14 @@ export const BasicDashboard: React.FC = () => {
     setIsAddModalOpen(false);
   };
 
+  // Cumulative spend up to scrub day
+  const cumulativeSpendAtDay = transactions
+    .filter((t) => {
+      const day = parseInt(t.date.split("-")[2], 10) || 1;
+      return day <= scrubDay;
+    })
+    .reduce((acc, t) => acc + t.amount, 0);
+
   const filteredTransactions =
     selectedCategoryFilter === "ALL"
       ? transactions
@@ -73,18 +90,27 @@ export const BasicDashboard: React.FC = () => {
   return (
     <section
       id="dashboard"
-      className="relative w-full py-24 md:py-32 px-6 sm:px-8 md:px-12 lg:px-16 bg-background text-foreground"
+      className="relative w-full py-24 md:py-36 px-6 sm:px-8 md:px-12 lg:px-16 bg-obsidian-950 text-foreground border-t border-white/[0.06]"
     >
       <div className="max-w-7xl mx-auto space-y-20">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/[0.08] pb-8">
           <div>
-            <SectionLabel index="03" title="Executive Command Center" tag="DATA SYNTHESIS" />
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tightest mt-3">
+            <SectionLabel index="06" title="Executive Command Center" tag="COMMAND & LEDGER" />
+            <h2 className="text-4xl md:text-5xl lg:text-7xl font-extralight tracking-tightest mt-3 text-foreground">
               FINANCIAL COMMAND.
             </h2>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            {onOpenStory && (
+              <MagneticButton
+                variant="secondary"
+                onClick={onOpenStory}
+                cursorLabel="STORY"
+              >
+                <Play className="w-3.5 h-3.5 text-financial-accent" /> Launch VEYRA Story
+              </MagneticButton>
+            )}
             <MagneticButton
               variant="primary"
               onClick={() => setIsAddModalOpen(true)}
@@ -101,7 +127,7 @@ export const BasicDashboard: React.FC = () => {
           <div className="lg:col-span-7 space-y-8">
             <div className="border-l-2 border-foreground/30 pl-6 space-y-2">
               <span className="font-mono text-xs uppercase tracking-mega text-foreground-muted">
-                NET AUGUST LIQUIDITY
+                NET AUGUST CAPITAL PRESERVATION
               </span>
               <div className="py-1">
                 <DisplayNumber amount={savings} size="hero" status="positive" />
@@ -118,7 +144,7 @@ export const BasicDashboard: React.FC = () => {
             {/* Asymmetrical Metric Strip */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4 border-t border-white/[0.06]">
               <FinancialMetric
-                label="Gross Earnings"
+                label="Gross Inflow"
                 value={income}
                 statusColor="neutral"
                 change="+100%"
@@ -126,7 +152,7 @@ export const BasicDashboard: React.FC = () => {
                 caption="Primary cashflow"
               />
               <FinancialMetric
-                label="Capital Deployed"
+                label="Total Deployed"
                 value={totalSpend}
                 statusColor="amber"
                 change={`${Math.round((totalSpend / income) * 100)}%`}
@@ -145,72 +171,58 @@ export const BasicDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Column: Key Health & Discipline Glances */}
+          {/* Right Column: Timeline Scrubbing & Month Pace */}
           <div className="lg:col-span-5 space-y-6">
             <GlassPanel variant="default" className="p-8 space-y-6">
               <div className="flex items-center justify-between border-b border-white/[0.06] pb-4 font-mono text-xs text-foreground-muted uppercase tracking-wider">
-                <span>VEYRA SCORE AUDIT</span>
-                <span className="text-financial-positive font-semibold">
-                  {health.tier}
+                <span>CUMULATIVE PACE SCRUBBER</span>
+                <span className="text-financial-accent font-semibold">
+                  AUG {scrubDay < 10 ? `0${scrubDay}` : scrubDay}
                 </span>
               </div>
 
-              <div className="space-y-4 font-mono text-xs">
-                <div>
-                  <div className="flex justify-between text-foreground-muted mb-1.5">
-                    <span>Savings Health</span>
-                    <span className="text-foreground">{health.metrics.savingsHealth}%</span>
-                  </div>
-                  <div className="w-full h-1 bg-obsidian-700">
-                    <div
-                      className="h-full bg-financial-positive"
-                      style={{ width: `${health.metrics.savingsHealth}%` }}
-                    />
-                  </div>
+              <div className="space-y-3">
+                <div className="flex justify-between items-baseline">
+                  <span className="font-mono text-xs text-foreground-muted">
+                    Outflows Through Day {scrubDay}
+                  </span>
+                  <span className="text-2xl font-light text-foreground tabular-nums">
+                    {formatCurrency(cumulativeSpendAtDay)}
+                  </span>
                 </div>
 
-                <div>
-                  <div className="flex justify-between text-foreground-muted mb-1.5">
-                    <span>Budget Discipline</span>
-                    <span className="text-foreground">{health.metrics.budgetDiscipline}%</span>
-                  </div>
-                  <div className="w-full h-1 bg-obsidian-700">
-                    <div
-                      className="h-full bg-financial-cyan"
-                      style={{ width: `${health.metrics.budgetDiscipline}%` }}
-                    />
-                  </div>
-                </div>
+                {/* Range Slider for Date Scrubbing */}
+                <input
+                  type="range"
+                  min="1"
+                  max="31"
+                  value={scrubDay}
+                  onChange={(e) => setScrubDay(Number(e.target.value))}
+                  className="w-full h-1.5 bg-obsidian-700 accent-financial-accent cursor-pointer"
+                />
 
-                <div>
-                  <div className="flex justify-between text-foreground-muted mb-1.5">
-                    <span>Expense Stability</span>
-                    <span className="text-foreground">{health.metrics.expenseStability}%</span>
-                  </div>
-                  <div className="w-full h-1 bg-obsidian-700">
-                    <div
-                      className="h-full bg-financial-accent"
-                      style={{ width: `${health.metrics.expenseStability}%` }}
-                    />
-                  </div>
+                <div className="flex justify-between font-mono text-[10px] text-foreground-dim uppercase">
+                  <span>AUG 01</span>
+                  <span>AUG 15</span>
+                  <span>AUG 31</span>
                 </div>
               </div>
 
-              <p className="text-xs text-foreground-dim leading-relaxed pt-2">
-                {health.summary}
+              <p className="text-xs text-foreground-dim leading-relaxed pt-2 border-t border-white/[0.04]">
+                Scrub through calendar days to observe how micro-purchases and fixed commitments accumulated across the month.
               </p>
             </GlassPanel>
           </div>
         </div>
 
-        {/* Category Budget Allocation (Editorial Bars) */}
+        {/* Category Budget Allocation (Asymmetrical Pressure Visualization) */}
         <div className="space-y-6 pt-12 border-t border-white/[0.08]">
           <div className="flex items-center justify-between">
             <span className="font-mono text-xs uppercase tracking-mega text-foreground-muted">
-              CATEGORY ALLOCATION ADHERENCE
+              BUDGET PRESSURE ARCHITECTURE
             </span>
             <span className="font-mono text-xs text-foreground-dim">
-              {budgets.length} CATEGORIES MONITORED
+              {budgets.length} ACTIVE CAPS MONITORED
             </span>
           </div>
 
@@ -229,9 +241,9 @@ export const BasicDashboard: React.FC = () => {
                       className={clsx(
                         "text-[10px] px-1.5 py-0.5",
                         b.status === "exceeded"
-                          ? "bg-financial-danger/20 text-financial-danger"
+                          ? "bg-financial-danger/20 text-financial-danger font-semibold"
                           : b.status === "warning"
-                          ? "bg-financial-warning/20 text-financial-warning"
+                          ? "bg-financial-warning/20 text-financial-warning font-semibold"
                           : "bg-white/[0.05] text-foreground-muted"
                       )}
                     >
@@ -239,6 +251,7 @@ export const BasicDashboard: React.FC = () => {
                     </span>
                   </div>
                 </div>
+                {/* Multi-stage Tension Bar */}
                 <div className="w-full h-1.5 bg-obsidian-800 overflow-hidden">
                   <div
                     className={clsx(
@@ -257,7 +270,7 @@ export const BasicDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Transaction Ledger Table */}
+        {/* Cinematic Transaction Ledger with Focus Hovering */}
         <div className="space-y-6 pt-12 border-t border-white/[0.08]">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -288,32 +301,46 @@ export const BasicDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Ledger Table */}
+          {/* Ledger Table with Hover Focus */}
           <div className="border border-white/[0.06] overflow-hidden">
             <div className="divide-y divide-white/[0.04]">
-              {filteredTransactions.map((tx) => (
-                <div
-                  key={tx.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between p-4 md:px-6 hover:bg-white/[0.02] transition-colors duration-200 gap-2 font-mono text-xs"
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-foreground-dim w-20">{tx.date}</span>
-                    <div>
-                      <div className="text-foreground font-medium">{tx.title}</div>
-                      <div className="text-[11px] text-foreground-muted">{tx.merchant}</div>
+              {filteredTransactions.map((tx) => {
+                const isHovered = hoveredTxId === tx.id;
+                const hasHover = hoveredTxId !== null;
+
+                return (
+                  <div
+                    key={tx.id}
+                    onMouseEnter={() => setHoveredTxId(tx.id)}
+                    onMouseLeave={() => setHoveredTxId(null)}
+                    className={clsx(
+                      "flex flex-col sm:flex-row sm:items-center justify-between p-4 md:px-6 transition-all duration-300 gap-2 font-mono text-xs",
+                      isHovered
+                        ? "bg-white/[0.05] border-l-2 border-financial-accent pl-4 md:pl-5"
+                        : hasHover
+                        ? "opacity-40"
+                        : "hover:bg-white/[0.02]"
+                    )}
+                  >
+                    <div className="flex items-center gap-4">
+                      <span className="text-foreground-dim w-20">{tx.date}</span>
+                      <div>
+                        <div className="text-foreground font-medium">{tx.title}</div>
+                        <div className="text-[11px] text-foreground-muted">{tx.merchant}</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between sm:justify-end gap-4">
+                      <span className="text-[10px] px-2 py-0.5 border border-white/[0.06] text-foreground-dim">
+                        {tx.category}
+                      </span>
+                      <span className="text-foreground font-semibold text-sm tabular-nums">
+                        -₹{tx.amount.toLocaleString("en-IN")}
+                      </span>
                     </div>
                   </div>
-
-                  <div className="flex items-center justify-between sm:justify-end gap-4">
-                    <span className="text-[10px] px-2 py-0.5 border border-white/[0.06] text-foreground-dim">
-                      {tx.category}
-                    </span>
-                    <span className="text-foreground font-semibold text-sm tabular-nums">
-                      -₹{tx.amount.toLocaleString("en-IN")}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

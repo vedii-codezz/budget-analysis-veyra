@@ -39,7 +39,6 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} dark`}>
       <body className="bg-background text-foreground font-sans selection:bg-white/20 selection:text-white bg-noise antialiased">
         <CustomCursor />
-        <Navbar />
         <main className="relative z-10">{children}</main>
       </body>
     </html>

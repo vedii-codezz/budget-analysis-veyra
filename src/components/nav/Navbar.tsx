@@ -3,11 +3,14 @@
 import React, { useState, useEffect } from "react";
 import { usePreferencesStore } from "@/store/preferences";
 import { useUIStore } from "@/store/ui";
-import { MagneticButton } from "@/components/ui/MagneticButton";
-import { Sparkles, EyeOff, Eye } from "lucide-react";
+import { Sparkles, EyeOff, Eye, Play } from "lucide-react";
 import { clsx } from "clsx";
 
-export const Navbar: React.FC = () => {
+interface NavbarProps {
+  onOpenStory?: () => void;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({ onOpenStory }) => {
   const [time, setTime] = useState("");
   const [scrolled, setScrolled] = useState(false);
   const { reducedMotion, toggleReducedMotion } = usePreferencesStore();
@@ -42,7 +45,11 @@ export const Navbar: React.FC = () => {
   const navLinks = [
     { id: "hero", label: "Overview", href: "#hero" },
     { id: "story", label: "Trajectory", href: "#story" },
-    { id: "dashboard", label: "Command Center", href: "#dashboard" },
+    { id: "universe", label: "Universe", href: "#universe" },
+    { id: "score", label: "Score", href: "#score" },
+    { id: "flow", label: "Flow", href: "#flow" },
+    { id: "insights", label: "Insights", href: "#insights" },
+    { id: "dashboard", label: "Command", href: "#dashboard" },
   ];
 
   return (
@@ -50,8 +57,8 @@ export const Navbar: React.FC = () => {
       className={clsx(
         "fixed top-0 left-0 right-0 z-40 transition-all duration-500",
         scrolled
-          ? "bg-obsidian-950/80 backdrop-blur-xl border-b border-white/[0.05] py-3.5"
-          : "bg-transparent py-6"
+          ? "bg-obsidian-950/85 backdrop-blur-2xl border-b border-white/[0.06] py-3"
+          : "bg-transparent py-5"
       )}
     >
       <div className="max-w-7xl mx-auto px-6 sm:px-8 md:px-12 flex items-center justify-between">
@@ -72,7 +79,7 @@ export const Navbar: React.FC = () => {
         </a>
 
         {/* Minimal Navigation */}
-        <nav className="hidden md:flex items-center gap-1 border border-white/[0.06] bg-obsidian-900/60 backdrop-blur-md px-3 py-1.5 rounded-full">
+        <nav className="hidden lg:flex items-center gap-1 border border-white/[0.06] bg-obsidian-900/60 backdrop-blur-md px-3 py-1.5 rounded-full">
           {navLinks.map((link) => {
             const isActive = activeSection === link.id;
             return (
@@ -81,7 +88,7 @@ export const Navbar: React.FC = () => {
                 href={link.href}
                 onClick={() => setActiveSection(link.id)}
                 className={clsx(
-                  "relative px-4 py-1.5 font-mono text-xs tracking-wider uppercase transition-colors duration-300 rounded-full",
+                  "relative px-3.5 py-1 font-mono text-xs tracking-wider uppercase transition-colors duration-300 rounded-full",
                   isActive
                     ? "text-foreground font-medium"
                     : "text-foreground-muted hover:text-foreground"
@@ -97,9 +104,20 @@ export const Navbar: React.FC = () => {
         </nav>
 
         {/* Right Status Indicators & Controls */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
+          {/* Launch VEYRA Story Button */}
+          {onOpenStory && (
+            <button
+              onClick={onOpenStory}
+              className="flex items-center gap-1.5 px-3 py-1 bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.1] font-mono text-[10px] text-foreground uppercase tracking-widest transition-colors"
+            >
+              <Play className="w-2.5 h-2.5 text-financial-accent" />
+              <span>Story Recap</span>
+            </button>
+          )}
+
           {/* Real-time telemetry */}
-          <div className="hidden lg:flex items-center gap-2 font-mono text-[11px] text-foreground-muted border-r border-white/[0.08] pr-4">
+          <div className="hidden xl:flex items-center gap-2 font-mono text-[11px] text-foreground-muted border-r border-white/[0.08] pr-4">
             <span className="w-1.5 h-1.5 rounded-full bg-financial-positive animate-pulse" />
             <span className="text-foreground-dim">{"LIVE //"}</span>
             <span className="tabular-nums text-foreground/80">{time || "00:00:00"}</span>
