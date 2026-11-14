@@ -222,7 +222,7 @@ export const SpendingUniverse: React.FC = () => {
                       onMouseEnter={(event) => {
                         setHoverAnchor(event.currentTarget);
                         setHoveredCategory(node.category);
-                        setCursorContext({ variant: "explore", label: "EXPLORE" });
+                        if (size >= 140) setCursorContext({ variant: "explore", label: "EXPLORE" });
                       }}
                       onMouseLeave={() => {
                         setHoveredCategory(null);

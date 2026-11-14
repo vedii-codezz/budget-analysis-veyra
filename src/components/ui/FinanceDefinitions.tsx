@@ -27,7 +27,7 @@ export function CalculationInfo({ label, children }: { label: string; children: 
         className="w-[calc(100%-2rem)] max-w-sm border border-line bg-surface p-5 text-left text-foreground backdrop:bg-background/80">
         <span id={id} className="block text-sm font-medium">How this is calculated</span>
         <span className="mt-2 block text-sm text-foreground-muted">{children}</span>
-        <button autoFocus type="button" className="mt-4 border border-line px-3 py-2 text-xs"
+        <button type="button" className="mt-4 border border-line px-3 py-2 text-xs"
           onClick={() => dialog.current?.close()}>Close</button>
       </dialog>
     </span>

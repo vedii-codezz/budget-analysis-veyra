@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { usePreferencesStore } from "@/store/preferences";
 import { useUIStore } from "@/store/ui";
-import { Sparkles, EyeOff, Eye, Play } from "lucide-react";
+import { Sparkles, EyeOff, Play } from "lucide-react";
 import { clsx } from "clsx";
 
 interface NavbarProps {
@@ -11,33 +11,17 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenStory }) => {
-  const [time, setTime] = useState("");
   const [scrolled, setScrolled] = useState(false);
   const { reducedMotion, toggleReducedMotion } = usePreferencesStore();
   const { activeSection, setActiveSection } = useUIStore();
 
   useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setTime(
-        now.toLocaleTimeString("en-IN", {
-          hour12: false,
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        })
-      );
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-
     const onScroll = () => {
       setScrolled(window.scrollY > 40);
     };
     window.addEventListener("scroll", onScroll);
 
     return () => {
-      clearInterval(interval);
       window.removeEventListener("scroll", onScroll);
     };
   }, []);
@@ -115,13 +99,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenStory }) => {
               <span>Story Recap</span>
             </button>
           )}
-
-          {/* Real-time telemetry */}
-          <div className="hidden xl:flex items-center gap-2 font-mono text-xs text-foreground-muted border-r border-line pr-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-foreground-muted animate-pulse" />
-            <span className="text-foreground-dim">{"DEMO //"}</span>
-            <span className="tabular-nums text-foreground">{time || "00:00:00"}</span>
-          </div>
 
           {/* Reduced Motion Toggle */}
           <button

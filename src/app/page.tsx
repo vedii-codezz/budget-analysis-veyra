@@ -33,16 +33,16 @@ export default function Home() {
   useEffect(() => {
     useFinanceStore.getState().hydrate();
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
-    usePreferencesStore.getState().setReducedMotion(preference.matches);
+    usePreferencesStore.getState().syncReducedMotion(preference.matches);
     let seen = false;
     try {
       seen = localStorage.getItem("veyra-boot-seen") === "true";
     } catch {
       // Storage is optional for the boot sequence.
     }
-    setShowBoot(!seen && !preference.matches);
+    setShowBoot(!seen && !usePreferencesStore.getState().reducedMotion);
     setMotionReady(true);
-    const syncPreference = () => usePreferencesStore.getState().setReducedMotion(preference.matches);
+    const syncPreference = () => usePreferencesStore.getState().syncReducedMotion(preference.matches);
     preference.addEventListener("change", syncPreference);
     return () => preference.removeEventListener("change", syncPreference);
   }, []);
