@@ -10,7 +10,7 @@ interface PreferencesState {
 }
 
 export const usePreferencesStore = create<PreferencesState>((set) => ({
-  reducedMotion: false,
+  reducedMotion: true,
   currency: "INR",
   setReducedMotion: (reducedMotion) => set({ reducedMotion }),
   toggleReducedMotion: () => set((state) => ({ reducedMotion: !state.reducedMotion })),

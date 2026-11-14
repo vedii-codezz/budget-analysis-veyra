@@ -6,7 +6,9 @@ export type TransactionCategory =
   | "Subscriptions & SaaS"
   | "Entertainment & Leisure"
   | "Health & Wellness"
-  | "Investments & Savings";
+  | "Investments & Savings"
+  | "Travel"
+  | "Other";
 
 export interface Transaction {
   id: string;
@@ -15,6 +17,8 @@ export interface Transaction {
   amount: number;
   category: TransactionCategory;
   date: string; // YYYY-MM-DD
+  type: "expense" | "investment" | "income";
+  oneOff?: boolean;
   isRecurring?: boolean;
   notes?: string;
 }
@@ -22,8 +26,6 @@ export interface Transaction {
 export interface CategoryBudget {
   category: TransactionCategory;
   allocated: number;
-  spent: number;
-  color: string;
 }
 
 export interface SavingsGoal {

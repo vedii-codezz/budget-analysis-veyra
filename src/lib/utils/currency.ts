@@ -56,10 +56,10 @@ export function formatCurrency(
     maximumFractionDigits: showDecimals ? 2 : 0,
   });
 
-  const prefix = amount < 0 ? "-" : sign;
+  const prefix = amount < 0 ? "−" : sign;
   return `${prefix}${symbol}${formattedNum}`;
 }
 
 export function formatPercentage(value: number, includeDecimals = 1): string {
-  return `${value.toFixed(includeDecimals)}%`;
+  return `${value.toFixed(includeDecimals).replace("-", "−")}%`;
 }

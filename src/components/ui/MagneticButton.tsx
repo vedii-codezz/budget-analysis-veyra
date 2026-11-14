@@ -53,17 +53,17 @@ export const MagneticButton: React.FC<MagneticButtonProps> = ({
   };
 
   const baseStyles =
-    "relative inline-flex items-center justify-center font-mono text-xs tracking-widest uppercase transition-all duration-300 select-none overflow-hidden group focus:outline-none";
+    "relative inline-flex items-center justify-center font-mono text-xs tracking-widest uppercase transition-all duration-300 select-none overflow-hidden group focus-visible:outline focus-visible:outline-2 focus-visible:outline-foreground-muted";
 
   const variants = {
     primary:
-      "bg-foreground text-background font-medium hover:bg-foreground/90 border border-foreground/20 active:scale-98",
+      "bg-foreground text-background font-medium hover:bg-foreground-muted border border-foreground/20 active:scale-98",
     secondary:
-      "bg-obsidian-800 text-foreground border border-obsidian-600 hover:border-obsidian-500 hover:bg-obsidian-700/80 active:scale-98",
+      "bg-transparent text-foreground-muted border border-line hover:bg-background active:scale-98",
     ghost:
-      "bg-transparent text-foreground-muted hover:text-foreground hover:bg-white/[0.03] active:scale-98",
+      "bg-transparent text-foreground-muted hover:text-foreground hover:bg-background active:scale-98",
     glass:
-      "bg-white/[0.03] backdrop-blur-md text-foreground border border-white/[0.08] hover:border-white/[0.18] hover:bg-white/[0.06] active:scale-98",
+      "bg-surface backdrop-blur-md text-foreground border border-line hover:border-line hover:bg-background active:scale-98",
   };
 
   const sizes = {
@@ -85,7 +85,7 @@ export const MagneticButton: React.FC<MagneticButtonProps> = ({
       {...(props as any)}
     >
       <span className="relative z-10 flex items-center gap-2">{children}</span>
-      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
+      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-foreground/10 to-transparent pointer-events-none" />
     </motion.button>
   );
 };

@@ -28,7 +28,7 @@ export const SectionWrapper: React.FC<SectionWrapperProps> = ({
     >
       {/* Subtle background technical grid line */}
       {hasGridLine && (
-        <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:4rem_4rem]" />
+        <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[linear-gradient(to_right,var(--line)_1px,transparent_1px),linear-gradient(to_bottom,var(--line)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
       )}
 
       <div

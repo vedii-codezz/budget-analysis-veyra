@@ -10,22 +10,18 @@ import { ArrowDown, Compass, ShieldCheck, TrendingUp } from "lucide-react";
 import { formatPercentage } from "@/lib/utils/currency";
 
 export const CinematicHero: React.FC = () => {
+  const { income, deployed: monthlySpend, cashRetained: availableLiquidity, cashRetainedRate: savingsRate } = useFinanceStore((s) => s.metrics);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const income = useFinanceStore((s) => s.income);
-  const getMonthlySpend = useFinanceStore((s) => s.getMonthlySpend);
-  const getSavings = useFinanceStore((s) => s.getSavings);
-  const getSavingsRate = useFinanceStore((s) => s.getSavingsRate);
   const reducedMotion = usePreferencesStore((s) => s.reducedMotion);
 
-  const monthlySpend = getMonthlySpend();
-  const savings = getSavings();
-  const savingsRate = getSavingsRate();
-  const availableLiquidity = Math.max(0, income - monthlySpend);
 
   // Calm, atmospheric ambient lighting behind hero
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    const palette = getComputedStyle(document.documentElement);
+    const particleColor = palette.getPropertyValue("--text").trim();
+    const glowColor = palette.getPropertyValue("--text-secondary").trim();
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -73,9 +69,9 @@ export const CinematicHero: React.FC = () => {
         mouse.y,
         width * 0.4
       );
-      gradient.addColorStop(0, "rgba(255, 255, 255, 0.025)");
-      gradient.addColorStop(0.6, "rgba(99, 102, 241, 0.012)");
-      gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+      gradient.addColorStop(0, glowColor + "06");
+      gradient.addColorStop(0.6, glowColor + "03");
+      gradient.addColorStop(1, "transparent");
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
 
@@ -91,7 +87,7 @@ export const CinematicHero: React.FC = () => {
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
+        ctx.fillStyle = particleColor + Math.round(p.alpha * 255).toString(16).padStart(2, "0");
         ctx.fill();
       }
 
@@ -110,7 +106,7 @@ export const CinematicHero: React.FC = () => {
   return (
     <section
       id="hero"
-      className="relative min-h-screen w-full flex flex-col justify-between pt-32 pb-16 px-6 sm:px-8 md:px-12 lg:px-16 overflow-hidden select-none bg-obsidian-950"
+      className="relative min-h-screen w-full flex flex-col justify-between pt-32 pb-16 px-6 sm:px-8 md:px-12 lg:px-16 overflow-hidden select-none bg-background"
     >
       {/* Background Calm Ambient Canvas */}
       <canvas
@@ -119,11 +115,11 @@ export const CinematicHero: React.FC = () => {
       />
 
       {/* Top Editorial Index */}
-      <div className="relative z-10 max-w-7xl mx-auto w-full flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.06] pb-6">
-        <SectionLabel index="01" title="Financial Matrix" tag="August 2026" />
+      <div className="relative z-10 max-w-7xl mx-auto w-full flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-line pb-6">
+        <SectionLabel index="01" title="Financial Matrix" tag="Demo data · August 2026" />
         <div className="font-mono text-[11px] text-foreground-dim flex items-center gap-4">
-          <span className="text-financial-positive flex items-center gap-1">
-            <TrendingUp className="w-3 h-3" /> +{formatPercentage(savingsRate)} Savings velocity
+          <span className={`flex items-center gap-1 ${savingsRate < 0 ? "text-danger" : "text-foreground-muted"}`}>
+            {savingsRate >= 0 && <TrendingUp className="w-3 h-3" />} {formatPercentage(savingsRate)} Cash retained
           </span>
         </div>
       </div>
@@ -134,16 +130,17 @@ export const CinematicHero: React.FC = () => {
           {/* Headline Column */}
           <div className="lg:col-span-7 flex flex-col gap-6">
             <div className="space-y-2">
-              <span className="font-mono text-xs text-foreground-muted tracking-widest uppercase block mb-1">
+              <span className="font-mono text-xs text-foreground-dim tracking-widest uppercase block mb-1">
                 Financial Intelligence
               </span>
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extralight tracking-tightest text-foreground leading-[0.92]">
                 YOUR MONEY.
                 <br />
-                <span className="font-normal italic text-foreground/90 font-serif">IN FOCUS.</span>
+                <span className="font-normal italic text-foreground font-serif">IN FOCUS.</span>
               </h1>
             </div>
 
+            <p className="text-foreground text-base">Personal budget analysis dashboard</p>
             <p className="text-foreground-muted text-base md:text-lg max-w-xl font-light leading-relaxed">
               Understand where your capital flows, discover structural spending patterns,
               and command your financial trajectory with absolute clarity.
@@ -173,20 +170,21 @@ export const CinematicHero: React.FC = () => {
 
           {/* Large Financial Available Liquidity Display */}
           <div className="lg:col-span-5 flex flex-col items-start lg:items-end justify-end">
-            <div className="bg-obsidian-900/40 backdrop-blur-xl border border-white/[0.08] p-8 md:p-10 w-full max-w-md relative overflow-hidden transition-colors duration-500">
+            <div className="bg-surface backdrop-blur-xl border border-line p-8 md:p-10 w-full max-w-md relative overflow-hidden transition-colors duration-500">
               <span className="font-mono text-xs tracking-mega uppercase text-foreground-muted block mb-3">
-                AVAILABLE LIQUIDITY
+                CASH RETAINED
               </span>
 
               <div className="my-2">
                 <DisplayNumber
                   amount={availableLiquidity}
                   size="xl"
-                  status="positive"
+                  status={availableLiquidity < 0 ? "danger" : "neutral"}
                 />
               </div>
 
-              <div className="pt-6 mt-6 border-t border-white/[0.06] flex items-center justify-between text-xs font-mono text-foreground-dim">
+              {availableLiquidity < 0 && <p className="inline-block bg-background text-danger font-mono text-xs">Over budget</p>}
+              <div className="pt-6 mt-6 border-t border-line flex items-center justify-between text-xs font-mono text-foreground-muted">
                 <div>
                   <span className="block text-[10px] text-foreground-muted uppercase tracking-wider">
                     Total Inflow
@@ -199,7 +197,7 @@ export const CinematicHero: React.FC = () => {
                   <span className="block text-[10px] text-foreground-muted uppercase tracking-wider">
                     Allocated Burn
                   </span>
-                  <span className="text-financial-warning font-medium text-sm tabular-nums">
+                  <span className="text-foreground-muted font-medium text-sm tabular-nums">
                     ₹{monthlySpend.toLocaleString("en-IN")}
                   </span>
                 </div>
@@ -210,11 +208,11 @@ export const CinematicHero: React.FC = () => {
       </div>
 
       {/* Bottom Telemetry Scroll Indicator */}
-      <div className="relative z-10 max-w-7xl mx-auto w-full flex items-center justify-between border-t border-white/[0.06] pt-6 font-mono text-[11px] text-foreground-dim">
+      <div className="relative z-10 max-w-7xl mx-auto w-full flex items-center justify-between border-t border-line pt-6 font-mono text-[11px] text-foreground-dim">
         <span className="hidden sm:inline">Scroll to explore financial trajectory</span>
         <a
           href="#story"
-          className="flex items-center gap-2 text-foreground hover:text-financial-accent transition-colors duration-300 ml-auto sm:ml-0"
+          className="flex items-center gap-2 text-foreground hover:text-foreground-dim transition-colors duration-300 ml-auto sm:ml-0"
         >
           <span>Trajectory Sequence</span>
           <ArrowDown className="w-3.5 h-3.5 animate-bounce" />

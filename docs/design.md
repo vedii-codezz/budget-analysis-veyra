@@ -2,7 +2,29 @@
 
 ## Theme tokens
 
-The custom theme extends Tailwind's defaults. [Tailwind config](../tailwind.config.ts) and [global CSS](../src/app/globals.css) define the shared tokens.
+[Global CSS](../src/app/globals.css) defines the palette. [Tailwind](../tailwind.config.ts) maps its utility names to those properties.
+
+| Token | Value | Role |
+| --- | --- | --- |
+| `--bg` | `#12201A` | Page, inverse text on light fills, and the background behind semantic badges |
+| `--surface` | `#294239` | Cards, panels, dialogs, budget tracks, and the score track |
+| `--line` | `#4F6C62` | 1px borders, largest Spending Universe bubble, and the first river accent |
+| `--text-muted` | `#7D9A8E` | Labels, captions, section markers, and nav text over the page background |
+| `--text-secondary` | `#B7CEC2` | Body copy, positive values, small panel labels, chart fills, and soft hover glow |
+| `--text` | `#EEF5F0` | Headlines, largest figures, primary button fills, and the weekend bar |
+| `--danger` | `#E8826F` | Negative balances, deficits, and breached caps |
+| `--warn` | `#D9B45A` | Caps above 90% through 100%, plus the score's ATTENTION badge |
+
+- Primary buttons use `--text` with `--bg` labels. Secondary buttons use transparent fills, `--line` borders, and `--text-secondary` labels.
+- Budget bars switch from `--text-secondary` to `--warn` above 90% and to `--danger` above 100%. The weekday bar uses `--text-muted`.
+- Spending Universe bubbles are ranked by amount. The largest uses `--line` with `--text` labels. The next uses `--text-muted` and smaller bubbles use `--text-secondary`, both with `--bg` labels. The hover glow sits outside the label area.
+- The river uses `--line`, `--text-muted`, `--text-secondary`, and `--text` for its four accents. Each bucket shows its name and amount.
+- The score ring uses `--surface` for the track and `--text-secondary` for progress. Score status combines text and an icon for attention and deficit.
+- Small labels use `--text-secondary` on panels. Semantic text uses `--bg` behind it. Run `node scripts/check-palette.mjs` to verify contrast and detect hardcoded colors outside the global stylesheet.
+
+## Previous palette (replaced)
+
+These were the original theme values. The small-text dim token was later raised to `#9898a1` before this palette replacement.
 
 | Token | Value |
 | --- | --- |
@@ -17,7 +39,8 @@ The custom theme extends Tailwind's defaults. [Tailwind config](../tailwind.conf
 | `gradient-glass` | 135° white gradient from 4% to 1% opacity |
 | Scrollbar | 5px width and height, 2px thumb radius, `#1c1c20` thumb, `#2e2e36` on hover |
 
-The body uses inline SVG film grain with 0.03 opacity. Panels use translucent obsidian, low-opacity white borders and backdrop blur. Square panels and controls coexist with circular score and category graphics, pill navigation and circular status dots. The theme adds no custom spacing or border-radius scale. Category colors are listed in [Data model](data-model.md).
+The previous category colors also included `#8b5cf6`, `#ec4899`, `#14b8a6`, `#38bdf8` and `#94a3b8`.
+
 
 ## Typography
 

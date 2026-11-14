@@ -1,5 +1,6 @@
 "use client";
 
+import { FinanceDefinitions } from "@/components/ui/FinanceDefinitions";
 import React, { useState, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { useFinanceStore } from "@/store/finance";
@@ -14,88 +15,34 @@ import {
 import { clsx } from "clsx";
 
 export const VeyraScore: React.FC = () => {
+  const { health, cashRetained } = useFinanceStore((s) => s.metrics);
   const containerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(containerRef, { once: true, margin: "-100px" });
   const [selectedSignal, setSelectedSignal] = useState<string | null>(null);
 
-  const getFinancialHealth = useFinanceStore((s) => s.getFinancialHealth);
-  const getSavingsRate = useFinanceStore((s) => s.getSavingsRate);
-  const health = getFinancialHealth();
-  const savingsRate = getSavingsRate();
+  const statusColor = cashRetained < 0 ? "text-danger" : health.tier === "ATTENTION" ? "text-warn" : "text-foreground-muted";
   const reducedMotion = usePreferencesStore((s) => s.reducedMotion);
 
-  const peripheralMetrics = [
-    {
-      id: "savings",
-      label: "Savings Health",
-      value: `${health.metrics.savingsHealth}%`,
-      sub: `${savingsRate.toFixed(1)}% retention rate`,
-    },
-    {
-      id: "budget",
-      label: "Budget Discipline",
-      value: `${health.metrics.budgetDiscipline}%`,
-      sub: "Caps maintained",
-    },
-    {
-      id: "stability",
-      label: "Expense Stability",
-      value: `${health.metrics.expenseStability}%`,
-      sub: "Controlled variance",
-    },
-    {
-      id: "goals",
-      label: "Goal Progress",
-      value: `${health.metrics.goalProgress}%`,
-      sub: "Active reserves on track",
-    },
-  ];
-
-  const positiveSignals = [
-    {
-      id: "sig-1",
-      title: "Elevated Savings Retention",
-      desc: `Your capital retention efficiency stands at ${savingsRate.toFixed(1)}%, outperforming target benchmark.`,
-      impact: "+14 PTS",
-    },
-    {
-      id: "sig-2",
-      title: "Strong Budget Guardrails",
-      desc: "Housing, Investments, and SaaS commitments remain strictly within allocated caps.",
-      impact: "+9 PTS",
-    },
-    {
-      id: "sig-3",
-      title: "Predictable Fixed Commitments",
-      desc: "Fixed expenses are settled early in the monthly cycle, reducing month-end burn pressure.",
-      impact: "+6 PTS",
-    },
-  ];
-
-  const pressurePoints = [
-    {
-      id: "pres-1",
-      title: "Discretionary Dining Acceleration",
-      desc: "Food & Dining spending is pacing +12.4% faster than the previous 30-day baseline.",
-      impact: "-5 PTS",
-    },
-    {
-      id: "pres-2",
-      title: "Weekend Outflow Concentration",
-      desc: "Saturdays account for 34% of aggregate monthly discretionary capital outflows.",
-      impact: "-4 PTS",
-    },
-  ];
+  const peripheralMetrics = health.signals.map((signal) => ({
+    ...signal,
+    label: signal.title,
+    value: `${signal.points}/${signal.weight}`,
+    sub: signal.desc,
+  }));
+  const positiveSignals = health.signals.map((signal) => ({
+    ...signal,
+    impact: `+${signal.points} PTS`,
+  }));
 
   return (
     <section
       id="score"
       ref={containerRef}
-      className="relative w-full py-24 md:py-36 px-6 sm:px-8 md:px-12 lg:px-16 overflow-hidden bg-obsidian-950 border-t border-white/[0.06]"
+      className="relative w-full py-24 md:py-36 px-6 sm:px-8 md:px-12 lg:px-16 overflow-hidden bg-background border-t border-line"
     >
       <div className="max-w-7xl mx-auto space-y-16">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/[0.08] pb-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-line pb-8">
           <div>
             <SectionLabel index="04" title="Core Intelligence" tag="Health Index" />
             <h2 className="text-4xl md:text-5xl lg:text-7xl font-extralight tracking-tightest mt-3 text-foreground">
@@ -103,7 +50,7 @@ export const VeyraScore: React.FC = () => {
             </h2>
           </div>
           <div className="flex items-center gap-3 font-mono text-xs text-foreground-dim">
-            <Shield className="w-4 h-4 text-financial-positive" />
+            <Shield className="w-4 h-4 text-foreground-muted" />
             <span>Composite Financial Health Index</span>
           </div>
         </div>
@@ -117,8 +64,13 @@ export const VeyraScore: React.FC = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={isInView ? { scale: 1, opacity: 1 } : {}}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-full border border-white/[0.08] flex flex-col items-center justify-center p-6 text-center bg-obsidian-900/60 backdrop-blur-xl shadow-2xl"
+              className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-full border border-line flex flex-col items-center justify-center p-6 text-center bg-surface backdrop-blur-xl shadow-2xl shadow-background/70"
             >
+              <svg aria-hidden="true" viewBox="0 0 100 100" className="absolute inset-0 h-full w-full -rotate-90">
+                <circle cx="50" cy="50" r="49" pathLength="100" fill="none" stroke="var(--surface)" strokeWidth="1" />
+                <circle cx="50" cy="50" r="49" pathLength="100" fill="none" stroke="var(--text-secondary)"
+                  strokeWidth="1" strokeDasharray={health.score + " 100"} />
+              </svg>
               <span className="font-mono text-[10px] tracking-mega uppercase text-foreground-muted mb-1">
                 VEYRA SCORE
               </span>
@@ -135,8 +87,8 @@ export const VeyraScore: React.FC = () => {
                 )}
               </div>
 
-              <div className="inline-flex items-center gap-1.5 px-3 py-0.5 mt-1 bg-white/[0.04] border border-white/[0.1] font-mono text-[10px] text-financial-positive uppercase tracking-widest">
-                <span className="w-1.5 h-1.5 rounded-full bg-financial-positive" />
+              <div className={clsx("inline-flex items-center gap-1.5 px-3 py-0.5 mt-1 bg-background border border-line font-mono text-[10px] uppercase tracking-widest", statusColor)}>
+                {cashRetained < 0 || health.tier === "ATTENTION" ? <AlertTriangle aria-hidden="true" className="h-3 w-3" /> : <span className="w-1.5 h-1.5 rounded-full bg-foreground-muted" />}
                 {health.tier}
               </div>
             </motion.div>
@@ -146,7 +98,7 @@ export const VeyraScore: React.FC = () => {
               {peripheralMetrics.map((pm) => (
                 <div
                   key={pm.id}
-                  className="bg-obsidian-900/30 border border-white/[0.06] p-3.5 space-y-1"
+                  className="bg-surface border border-line p-3.5 space-y-1"
                 >
                   <div className="flex items-center justify-between text-xs font-mono text-foreground-muted">
                     <span>{pm.label}</span>
@@ -154,7 +106,7 @@ export const VeyraScore: React.FC = () => {
                       {pm.value}
                     </span>
                   </div>
-                  <div className="text-[10px] font-mono text-foreground-dim truncate">
+                  <div className="text-[10px] font-mono text-foreground-muted truncate">
                     {pm.sub}
                   </div>
                 </div>
@@ -176,9 +128,10 @@ export const VeyraScore: React.FC = () => {
               </p>
             </div>
 
+            <FinanceDefinitions />
             {/* Positive Signals Group */}
             <div className="space-y-3">
-              <div className="flex items-center gap-2 font-mono text-xs text-financial-positive uppercase tracking-wider">
+              <div className="flex items-center gap-2 font-mono text-xs text-foreground-muted uppercase tracking-wider">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 <span>Positive Signals</span>
               </div>
@@ -188,15 +141,15 @@ export const VeyraScore: React.FC = () => {
                     key={sig.id}
                     onClick={() => setSelectedSignal(sig.id === selectedSignal ? null : sig.id)}
                     className={clsx(
-                      "p-3.5 bg-obsidian-900/30 border transition-colors cursor-pointer select-none",
+                      "p-3.5 bg-surface border transition-colors cursor-pointer select-none",
                       selectedSignal === sig.id
-                        ? "border-financial-positive/40 bg-financial-positive/[0.02]"
-                        : "border-white/[0.06] hover:border-white/[0.12]"
+                        ? "border-line bg-background"
+                        : "border-line hover:border-line"
                     )}
                   >
                     <div className="flex items-center justify-between font-mono text-xs">
                       <span className="text-foreground font-medium">{sig.title}</span>
-                      <span className="text-financial-positive">{sig.impact}</span>
+                      <span className="text-foreground-muted">{sig.impact}</span>
                     </div>
                     <p className="text-xs text-foreground-muted font-light mt-1 leading-relaxed">
                       {sig.desc}
@@ -206,35 +159,9 @@ export const VeyraScore: React.FC = () => {
               </div>
             </div>
 
-            {/* Pressure Points Group */}
-            <div className="space-y-3 pt-2">
-              <div className="flex items-center gap-2 font-mono text-xs text-financial-warning uppercase tracking-wider">
-                <AlertTriangle className="w-3.5 h-3.5" />
-                <span>Pressure Points</span>
-              </div>
-              <div className="space-y-2">
-                {pressurePoints.map((pres) => (
-                  <div
-                    key={pres.id}
-                    onClick={() => setSelectedSignal(pres.id === selectedSignal ? null : pres.id)}
-                    className={clsx(
-                      "p-3.5 bg-obsidian-900/30 border transition-colors cursor-pointer select-none",
-                      selectedSignal === pres.id
-                        ? "border-financial-warning/40 bg-financial-warning/[0.02]"
-                        : "border-white/[0.06] hover:border-white/[0.12]"
-                    )}
-                  >
-                    <div className="flex items-center justify-between font-mono text-xs">
-                      <span className="text-foreground font-medium">{pres.title}</span>
-                      <span className="text-financial-warning">{pres.impact}</span>
-                    </div>
-                    <p className="text-xs text-foreground-muted font-light mt-1 leading-relaxed">
-                      {pres.desc}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <p className="font-mono text-xs text-foreground-muted">
+              Base {health.base} + {health.signals.map((signal) => signal.points).join(" + ")} = {health.score}
+            </p>
           </div>
         </div>
       </div>

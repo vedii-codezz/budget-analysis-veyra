@@ -4,8 +4,24 @@
 
 @layer base {
   :root {
-    --background: #050505;
-    --foreground: #f4f4f6;
+    color-scheme: dark;
+    accent-color: var(--text-secondary);
+    --bg: #12201A;
+    --surface: #294239;
+    --line: #4F6C62;
+    --text-muted: #7D9A8E;
+    --text-secondary: #B7CEC2;
+    --text: #EEF5F0;
+    --danger: #E8826F;
+    --warn: #D9B45A;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--text-secondary);
+  }
+
+  input::placeholder {
+    color: var(--text-muted);
   }
 
   * {
@@ -16,8 +32,8 @@
 
   html {
     scroll-behavior: smooth;
-    background-color: #050505;
-    color: #f4f4f6;
+    background-color: var(--bg);
+    color: var(--text);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -25,16 +41,16 @@
   }
 
   body {
-    background-color: #050505;
-    color: #f4f4f6;
+    background-color: var(--bg);
+    color: var(--text);
     overflow-x: hidden;
     min-height: 100vh;
     position: relative;
   }
 
   ::selection {
-    background-color: rgba(255, 255, 255, 0.2);
-    color: #ffffff;
+    background-color: var(--text-secondary);
+    color: var(--bg);
   }
 
   /* Custom Minimal Scrollbar */
@@ -44,16 +60,16 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: #050505;
+    background: var(--bg);
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #1c1c20;
+    background: var(--line);
     border-radius: 2px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #2e2e36;
+    background: var(--text-muted);
   }
 }
 
@@ -65,4 +81,10 @@
 /* Typography masking utilities */
 .text-mask-reveal {
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

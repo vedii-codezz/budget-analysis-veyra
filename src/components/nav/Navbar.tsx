@@ -57,7 +57,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenStory }) => {
       className={clsx(
         "fixed top-0 left-0 right-0 z-40 transition-all duration-500",
         scrolled
-          ? "bg-obsidian-950/85 backdrop-blur-2xl border-b border-white/[0.06] py-3"
+          ? "bg-background backdrop-blur-2xl border-b border-line py-3"
           : "bg-transparent py-5"
       )}
     >
@@ -72,14 +72,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenStory }) => {
             <span className="font-mono text-xs tracking-widest text-foreground font-semibold">
               VEYRA<span className="text-foreground-dim font-normal">{" // 01"}</span>
             </span>
-            <span className="text-[9px] font-mono text-foreground-dim uppercase tracking-wider hidden sm:inline">
+            <span className="text-xs font-mono text-foreground-dim uppercase tracking-wider hidden sm:inline">
               Financial Intelligence
             </span>
           </div>
         </a>
 
         {/* Minimal Navigation */}
-        <nav className="hidden lg:flex items-center gap-1 border border-white/[0.06] bg-obsidian-900/60 backdrop-blur-md px-3 py-1.5 rounded-full">
+        <nav className="hidden lg:flex items-center gap-1 border border-line bg-surface backdrop-blur-md px-3 py-1.5 rounded-full">
           {navLinks.map((link) => {
             const isActive = activeSection === link.id;
             return (
@@ -88,15 +88,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenStory }) => {
                 href={link.href}
                 onClick={() => setActiveSection(link.id)}
                 className={clsx(
-                  "relative px-3.5 py-1 font-mono text-xs tracking-wider uppercase transition-colors duration-300 rounded-full",
+                  "relative isolate px-3.5 py-1 font-mono text-xs tracking-wider uppercase transition-colors duration-300 rounded-full",
                   isActive
-                    ? "text-foreground font-medium"
+                    ? "text-foreground-dim font-medium"
                     : "text-foreground-muted hover:text-foreground"
                 )}
               >
                 {link.label}
                 {isActive && (
-                  <span className="absolute inset-0 bg-white/[0.08] rounded-full -z-10" />
+                  <span className="absolute inset-0 bg-background rounded-full -z-10" />
                 )}
               </a>
             );
@@ -109,18 +109,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenStory }) => {
           {onOpenStory && (
             <button
               onClick={onOpenStory}
-              className="flex items-center gap-1.5 px-3 py-1 bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.1] font-mono text-[10px] text-foreground uppercase tracking-widest transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1 bg-transparent hover:bg-background border border-line font-mono text-xs text-foreground-muted uppercase tracking-widest transition-colors"
             >
-              <Play className="w-2.5 h-2.5 text-financial-accent" />
+              <Play className="w-2.5 h-2.5 text-foreground-dim" />
               <span>Story Recap</span>
             </button>
           )}
 
           {/* Real-time telemetry */}
-          <div className="hidden xl:flex items-center gap-2 font-mono text-[11px] text-foreground-muted border-r border-white/[0.08] pr-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-financial-positive animate-pulse" />
-            <span className="text-foreground-dim">{"LIVE //"}</span>
-            <span className="tabular-nums text-foreground/80">{time || "00:00:00"}</span>
+          <div className="hidden xl:flex items-center gap-2 font-mono text-xs text-foreground-muted border-r border-line pr-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-foreground-muted animate-pulse" />
+            <span className="text-foreground-dim">{"DEMO //"}</span>
+            <span className="tabular-nums text-foreground">{time || "00:00:00"}</span>
           </div>
 
           {/* Reduced Motion Toggle */}
@@ -128,10 +128,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenStory }) => {
             onClick={toggleReducedMotion}
             title={reducedMotion ? "Enable full cinematic motion" : "Reduce motion for comfort"}
             className={clsx(
-              "flex items-center gap-1.5 px-2.5 py-1 font-mono text-[10px] tracking-wider uppercase border transition-colors duration-300",
+              "flex items-center gap-1.5 px-2.5 py-1 font-mono text-xs tracking-wider uppercase border transition-colors duration-300",
               reducedMotion
-                ? "bg-financial-warning/10 border-financial-warning/30 text-financial-warning"
-                : "border-white/[0.08] text-foreground-muted hover:text-foreground hover:border-white/[0.2]"
+                ? "bg-surface border-line text-foreground-muted"
+                : "border-line text-foreground-muted hover:text-foreground hover:border-line"
             )}
           >
             {reducedMotion ? <EyeOff className="w-3 h-3" /> : <Sparkles className="w-3 h-3" />}

@@ -31,18 +31,18 @@ export const FinancialMetric: React.FC<FinancialMetricProps> = ({
       : value;
 
   const colorMap = {
-    emerald: "text-financial-positive",
-    amber: "text-financial-warning",
-    crimson: "text-financial-danger",
-    indigo: "text-financial-accent",
+    emerald: "text-foreground-muted",
+    amber: "text-foreground-muted",
+    crimson: "text-foreground-muted",
+    indigo: "text-foreground-dim",
     neutral: "text-foreground",
   };
 
   const dotMap = {
-    emerald: "bg-financial-positive",
-    amber: "bg-financial-warning",
-    crimson: "bg-financial-danger",
-    indigo: "bg-financial-accent",
+    emerald: "bg-foreground-muted",
+    amber: "bg-foreground-muted",
+    crimson: "bg-foreground-muted",
+    indigo: "bg-foreground-muted",
     neutral: "bg-foreground-dim",
   };
 
@@ -57,8 +57,8 @@ export const FinancialMetric: React.FC<FinancialMetricProps> = ({
           <span
             className={clsx(
               "text-[10px] font-mono",
-              trend === "up" && "text-financial-positive",
-              trend === "down" && "text-financial-danger",
+              trend === "up" && "text-foreground-muted",
+              trend === "down" && "text-foreground-muted",
               trend === "neutral" && "text-foreground-dim"
             )}
           >

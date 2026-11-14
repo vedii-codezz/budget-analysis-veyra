@@ -21,24 +21,15 @@ export const VeyraStoryModal: React.FC<VeyraStoryModalProps> = ({
   isOpen,
   onClose,
 }) => {
+  const { income, consumption: spend, cashRetained: savings, cashRetainedRate: savingsRate, health, budgetUsage, weekendPremiumPct, weekendDescription, savedAndInvestedRate } = useFinanceStore((s) => s.metrics);
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const income = useFinanceStore((s) => s.income);
-  const getMonthlySpend = useFinanceStore((s) => s.getMonthlySpend);
-  const getSavings = useFinanceStore((s) => s.getSavings);
-  const getSavingsRate = useFinanceStore((s) => s.getSavingsRate);
-  const getFinancialHealth = useFinanceStore((s) => s.getFinancialHealth);
-  const budgets = useFinanceStore((s) => s.budgets);
 
-  const spend = getMonthlySpend();
-  const savings = getSavings();
-  const savingsRate = getSavingsRate();
-  const health = getFinancialHealth();
 
   // Find biggest category dynamically
-  const sortedBudgets = [...budgets].sort((a, b) => b.spent - a.spent);
-  const topCategory = sortedBudgets[0] || { category: "Housing & Utilities", spent: 24500 };
-  const topCategoryPct = spend > 0 ? (topCategory.spent / spend) * 100 : 41.9;
+  const sortedBudgets = budgetUsage.filter((b) => b.category !== "Investments & Savings").sort((a, b) => b.spent - a.spent);
+  const topCategory = sortedBudgets[0];
+  const topCategoryPct = spend > 0 ? (topCategory.spent / spend) * 100 : 0;
 
   const slides = [
     {
@@ -74,23 +65,23 @@ export const VeyraStoryModal: React.FC<VeyraStoryModalProps> = ({
       id: "slide-5",
       tag: "Pattern Discovery",
       title: "WEEKEND OUTFLOWS",
-      number: "+31% SURGE",
-      caption: "Saturday dining and leisure averaged ₹2,420 vs ₹1,080 on regular weekdays.",
+      number: weekendPremiumPct === null ? "NO WEEKDAY BASELINE" : `${weekendPremiumPct > 0 ? "+" : ""}${formatPercentage(weekendPremiumPct, 0)}`,
+      caption: weekendDescription(formatCurrency),
     },
     {
       id: "slide-6",
       tag: "Capital Preservation",
-      title: "YOU SAVED",
+      title: "CASH RETAINED",
       number: formatCurrency(savings),
-      subNumber: `${formatPercentage(savingsRate)} savings rate`,
-      caption: "Retained liquid surplus building wealth compounding and safety reserves.",
+      subNumber: `${formatPercentage(savingsRate)} cash retained`,
+      caption: savings < 0 ? "Over budget. Outflows exceeded income." : "Cash left after expenses and investments.",
     },
     {
       id: "slide-7",
       tag: "Historical Comparison",
-      title: "VS JULY PERFORMANCE",
-      number: "+4.2%",
-      caption: "Higher capital retention velocity than the preceding monthly cycle.",
+      title: "SAVED + INVESTED",
+      number: formatPercentage(savedAndInvestedRate),
+      caption: "Investment contributions and cash retained as a share of monthly income.",
     },
     {
       id: "slide-8",
@@ -149,14 +140,14 @@ export const VeyraStoryModal: React.FC<VeyraStoryModalProps> = ({
   const slide = slides[currentSlide];
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-between p-6 sm:p-10 md:p-16 bg-obsidian-950 text-foreground select-none">
+    <div className="fixed inset-0 z-50 flex flex-col justify-between p-6 sm:p-10 md:p-16 bg-surface text-foreground select-none">
       {/* Top Progress & Exit */}
       <div className="max-w-5xl mx-auto w-full space-y-4">
         <div className="grid grid-cols-9 gap-1.5 w-full">
           {slides.map((_, idx) => (
             <div
               key={idx}
-              className="h-1 bg-obsidian-800 rounded-none overflow-hidden cursor-pointer"
+              className="h-1 bg-surface rounded-none overflow-hidden cursor-pointer"
               onClick={() => setCurrentSlide(idx)}
             >
               <div
@@ -169,7 +160,7 @@ export const VeyraStoryModal: React.FC<VeyraStoryModalProps> = ({
           ))}
         </div>
 
-        <div className="flex items-center justify-between font-mono text-xs text-foreground-dim">
+        <div className="flex items-center justify-between font-mono text-xs text-foreground-muted">
           <div className="flex items-center gap-2">
             <span className="text-foreground font-medium">VEYRA STORY</span>
             <span>{"//"} 0{currentSlide + 1} of 0{totalSlides}</span>
@@ -196,7 +187,7 @@ export const VeyraStoryModal: React.FC<VeyraStoryModalProps> = ({
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="space-y-6"
           >
-            <span className="font-mono text-xs sm:text-sm tracking-mega uppercase text-financial-accent block">
+            <span className="font-mono text-xs sm:text-sm tracking-mega uppercase text-foreground-muted block">
               {slide.tag}
             </span>
 
@@ -205,7 +196,7 @@ export const VeyraStoryModal: React.FC<VeyraStoryModalProps> = ({
               {slide.subtitle && (
                 <>
                   <br />
-                  <span className="font-normal italic text-foreground/90 font-serif lowercase text-[0.9em]">
+                  <span className="font-normal italic text-foreground font-serif lowercase text-[0.9em]">
                     {slide.subtitle}
                   </span>
                 </>
@@ -219,7 +210,7 @@ export const VeyraStoryModal: React.FC<VeyraStoryModalProps> = ({
             )}
 
             {slide.subNumber && (
-              <div className="font-mono text-sm sm:text-base text-financial-positive uppercase tracking-widest">
+              <div className="font-mono text-sm sm:text-base text-foreground-muted uppercase tracking-widest">
                 {slide.subNumber}
               </div>
             )}
@@ -232,23 +223,23 @@ export const VeyraStoryModal: React.FC<VeyraStoryModalProps> = ({
       </div>
 
       {/* Bottom Story Navigation Controls */}
-      <div className="max-w-5xl mx-auto w-full flex items-center justify-between border-t border-white/[0.08] pt-6 font-mono text-xs">
+      <div className="max-w-5xl mx-auto w-full flex items-center justify-between border-t border-line pt-6 font-mono text-xs">
         <div className="flex items-center gap-4">
           {currentSlide > 0 ? (
             <button
               onClick={prevSlide}
-              className="flex items-center gap-2 px-4 py-2 border border-white/[0.1] text-foreground-muted hover:text-foreground transition-colors uppercase"
+              className="flex items-center gap-2 px-4 py-2 border border-line text-foreground-muted hover:text-foreground transition-colors uppercase"
             >
               <ArrowLeft className="w-4 h-4" /> Back
             </button>
           ) : (
-            <span className="text-foreground-dim uppercase">Start of recap</span>
+            <span className="text-foreground-muted uppercase">Start of recap</span>
           )}
 
           {currentSlide === totalSlides - 1 && (
             <button
               onClick={replay}
-              className="flex items-center gap-2 px-4 py-2 border border-white/[0.1] text-foreground hover:border-white/30 transition-colors uppercase"
+              className="flex items-center gap-2 px-4 py-2 border border-line text-foreground hover:border-line transition-colors uppercase"
             >
               <RotateCcw className="w-3.5 h-3.5" /> Replay
             </button>
@@ -258,7 +249,7 @@ export const VeyraStoryModal: React.FC<VeyraStoryModalProps> = ({
         {currentSlide < totalSlides - 1 ? (
           <button
             onClick={nextSlide}
-            className="flex items-center gap-2 px-6 py-2.5 bg-foreground text-background font-medium hover:bg-foreground/90 transition-colors uppercase tracking-wider"
+            className="flex items-center gap-2 px-6 py-2.5 bg-foreground text-background font-medium hover:bg-foreground-muted transition-colors uppercase tracking-wider"
           >
             <span>Continue</span>
             <ArrowRight className="w-4 h-4" />
@@ -266,7 +257,7 @@ export const VeyraStoryModal: React.FC<VeyraStoryModalProps> = ({
         ) : (
           <button
             onClick={onClose}
-            className="flex items-center gap-2 px-6 py-2.5 bg-foreground text-background font-medium hover:bg-foreground/90 transition-colors uppercase tracking-wider"
+            className="flex items-center gap-2 px-6 py-2.5 bg-foreground text-background font-medium hover:bg-foreground-muted transition-colors uppercase tracking-wider"
           >
             <span>Done</span>
           </button>

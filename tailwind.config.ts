@@ -1,5 +1,9 @@
 import type { Config } from "tailwindcss";
 
+const token = (name: string) => ({ opacityValue }: { opacityValue?: string }) =>
+  opacityValue === undefined ? `var(--${name})`
+    : `color-mix(in srgb, var(--${name}) calc(${opacityValue} * 100%), transparent)`;
+
 const config: Config = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,29 +13,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#050505",
-        obsidian: {
-          950: "#050505",
-          900: "#090909",
-          800: "#101010",
-          700: "#161616",
-          600: "#222222",
-          500: "#2d2d2d",
-        },
+        background: token("bg"),
+        surface: token("surface"),
+        line: token("line"),
         foreground: {
-          DEFAULT: "#f4f4f6",
-          muted: "#8a8a93",
-          dim: "#52525b",
-          dark: "#27272a",
+          DEFAULT: token("text"),
+          muted: token("text-secondary"),
+          dim: token("text-muted"),
         },
-        financial: {
-          positive: "#10b981", // emerald
-          warning: "#f59e0b",  // amber
-          danger: "#ef4444",   // crimson
-          accent: "#6366f1",   // indigo
-          gold: "#eab308",     // gold
-          cyan: "#06b6d4",     // cyan
-        },
+        danger: token("danger"),
+        warn: token("warn"),
       },
       fontFamily: {
         sans: [
@@ -58,9 +49,9 @@ const config: Config = {
         mega: "0.3em",
       },
       backgroundImage: {
-        "radial-subtle": "radial-gradient(circle at 50% 0%, rgba(255,255,255,0.03) 0%, transparent 70%)",
-        "radial-accent": "radial-gradient(circle at 50% 50%, rgba(99,102,241,0.08) 0%, transparent 60%)",
-        "gradient-glass": "linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)",
+        "radial-subtle": "radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--text-secondary) 3%, transparent) 0%, transparent 70%)",
+        "radial-accent": "radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--text-secondary) 8%, transparent) 0%, transparent 60%)",
+        "gradient-glass": "linear-gradient(135deg, color-mix(in srgb, var(--text-secondary) 4%, transparent) 0%, color-mix(in srgb, var(--text-secondary) 1%, transparent) 100%)",
       },
       animation: {
         "pulse-slow": "pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite",

@@ -6,48 +6,11 @@ import { usePreferencesStore } from "@/store/preferences";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { clsx } from "clsx";
 
-interface InsightItem {
-  id: string;
-  tag: string;
-  headline: string;
-  caption: string;
-  evidenceType: "weekend" | "micro" | "forecast" | "recurring";
-}
+import { useFinanceStore } from "@/store/finance";
+import { microThreshold } from "@/lib/finance";
+import { formatCurrency, formatPercentage } from "@/lib/utils/currency";
 
-const INSIGHTS: InsightItem[] = [
-  {
-    id: "ins-1",
-    tag: "Spending Pattern // 04",
-    headline: "YOUR WEEKENDS COST 31% MORE.",
-    caption:
-      "Saturday & Sunday discretionary outflows averaged ₹2,420 compared to ₹1,080 on regular weekdays.",
-    evidenceType: "weekend",
-  },
-  {
-    id: "ins-2",
-    tag: "Micro-Outflows // 05",
-    headline: "₹3,840 DISAPPEARED IN PURCHASES UNDER ₹300.",
-    caption:
-      "14 instant-delivery and specialty coffee runs accumulated into 6.5% of your total monthly expenditure.",
-    evidenceType: "micro",
-  },
-  {
-    id: "ins-3",
-    tag: "Budget Pacing // 02",
-    headline: "AT THIS RATE, FOOD WILL CROSS ITS BUDGET BY AUG 27.",
-    caption:
-      "Current dining velocity of ₹372/day projects an overburn of ₹1,480 beyond the ₹12,000 allocation cap.",
-    evidenceType: "forecast",
-  },
-  {
-    id: "ins-4",
-    tag: "Recurring Capital // 01",
-    headline: "3 SAAS COMMITMENTS DEPLOY ₹2,490 EVERY MONTH.",
-    caption:
-      "Cloud developer tools, Apple One, and streaming services maintain automated recurring deductions.",
-    evidenceType: "recurring",
-  },
-];
+const insightCount = 4;
 
 export const VeyraInsights: React.FC = () => {
   const [activeInsightIndex, setActiveInsightIndex] = useState(0);
@@ -74,8 +37,8 @@ export const VeyraInsights: React.FC = () => {
         onUpdate: (self) => {
           const progress = self.progress;
           const idx = Math.min(
-            INSIGHTS.length - 1,
-            Math.floor(progress * INSIGHTS.length)
+            insightCount - 1,
+            Math.floor(progress * insightCount)
           );
           setActiveInsightIndex(idx);
         },
@@ -87,20 +50,53 @@ export const VeyraInsights: React.FC = () => {
     };
   }, [reducedMotion]);
 
-  const current = INSIGHTS[activeInsightIndex];
+  const metrics = useFinanceStore((state) => state.metrics);
+  const { weekendPremiumPct, weekendDescription, weekendAvg, weekdayAvg, microPurchases,
+    foodDaily, foodForecast, foodCap, foodPacingPct, recurring, recurringTotal } = metrics;
+  const insights = [
+    {
+      tag: "Spending Pattern",
+      headline: weekendPremiumPct === null ? "WEEKEND OUTFLOWS."
+        : weekendPremiumPct === 0 ? "WEEKEND AND WEEKDAY SPEND MATCH."
+        : `YOUR WEEKENDS COST ${formatPercentage(Math.abs(weekendPremiumPct), 0)} ${weekendPremiumPct > 0 ? "MORE" : "LESS"}.`,
+      caption: weekendDescription(formatCurrency),
+      evidence: [["Weekend Average", formatCurrency(weekendAvg)], ["Weekday Average", formatCurrency(weekdayAvg)]],
+    },
+    {
+      tag: "Micro-Outflows",
+      headline: `${formatCurrency(microPurchases.total)} IN PURCHASES UNDER ${formatCurrency(microThreshold)}.`,
+      caption: `${microPurchases.count} purchases account for ${formatPercentage(microPurchases.share)} of monthly consumption.`,
+      evidence: [[`${microPurchases.count} Micro Purchases`, formatCurrency(microPurchases.total)]],
+    },
+    {
+      tag: "Budget Pacing",
+      headline: foodForecast > foodCap ? "FOOD IS PACING ABOVE ITS CAP." : "FOOD IS PACING WITHIN ITS CAP.",
+      caption: `At ${formatCurrency(foodDaily)} per day, dining is projected to reach ${formatPercentage(foodPacingPct)} of its cap.`,
+      evidence: [["Daily Pace", formatCurrency(foodDaily)], ["Projected Spend", formatCurrency(foodForecast)], ["Monthly Cap", formatCurrency(foodCap)]],
+    },
+    {
+      tag: "Recurring Capital",
+      headline: `${recurring.length} SUBSCRIPTION COMMITMENTS TOTAL ${formatCurrency(recurringTotal)}.`,
+      caption: "Recurring subscription outflows recorded this month.",
+      evidence: recurring.map((entry) => [entry.merchant, formatCurrency(entry.amount)]),
+    },
+  ];
+  const current = insights[activeInsightIndex];
+  const maxAverage = Math.max(weekendAvg, weekdayAvg, 1);
+  const barWidths = activeInsightIndex === 0 ? [weekendAvg, weekdayAvg] : [];
 
   return (
     <div
       ref={containerRef}
       id="insights"
-      className="relative w-full bg-obsidian-950 border-t border-white/[0.06]"
+      className="relative w-full bg-background border-t border-line"
     >
       <div
         ref={triggerRef}
         className="min-h-screen w-full flex flex-col justify-between py-24 px-6 sm:px-8 md:px-12 lg:px-16"
       >
         {/* Section Top Header */}
-        <div className="max-w-7xl mx-auto w-full flex items-center justify-between border-b border-white/[0.08] pb-6">
+        <div className="max-w-7xl mx-auto w-full flex items-center justify-between border-b border-line pb-6">
           <SectionLabel
             index="06"
             title="Behavioral Intelligence"
@@ -109,7 +105,7 @@ export const VeyraInsights: React.FC = () => {
           <div className="flex items-center gap-2 font-mono text-xs text-foreground-dim">
             <span className="text-foreground font-semibold">0{activeInsightIndex + 1}</span>
             <span>/</span>
-            <span>0{INSIGHTS.length}</span>
+            <span>0{insightCount}</span>
           </div>
         </div>
 
@@ -118,8 +114,8 @@ export const VeyraInsights: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             {/* Left Dominant Statement */}
             <div className="lg:col-span-8 space-y-6">
-              <span className="font-mono text-xs tracking-mega uppercase text-financial-accent block">
-                {current.tag}
+              <span className="font-mono text-xs tracking-mega uppercase text-foreground-dim block">
+                {`${current.tag} // 0${activeInsightIndex + 1}`}
               </span>
 
               <h2 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extralight tracking-tightest uppercase text-foreground leading-[0.92] transition-all duration-500">
@@ -133,95 +129,38 @@ export const VeyraInsights: React.FC = () => {
 
             {/* Right Understated Contextual Evidence */}
             <div className="lg:col-span-4 flex flex-col justify-center">
-              <div className="bg-obsidian-900/50 backdrop-blur-xl border border-white/[0.08] p-6 sm:p-8 space-y-6">
-                <span className="font-mono text-xs text-foreground-dim uppercase tracking-wider block border-b border-white/[0.06] pb-3">
+              <div className="bg-surface backdrop-blur-xl border border-line p-6 sm:p-8 space-y-6">
+                <span className="font-mono text-xs text-foreground-muted uppercase tracking-wider block border-b border-line pb-3">
                   Evidence Proof
                 </span>
 
-                {current.evidenceType === "weekend" && (
-                  <div className="space-y-4 font-mono text-xs">
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between text-foreground-muted">
-                        <span>Weekend Average</span>
-                        <span className="text-financial-warning font-semibold">₹2,420</span>
+                <div className="space-y-3 font-mono text-xs">
+                  {current.evidence.map(([label, value], index) => (
+                    <div key={label} className="space-y-1.5">
+                      <div className="flex justify-between gap-3 text-foreground-muted">
+                        <span>{label}</span>
+                        <span className="text-foreground">{value}</span>
                       </div>
-                      <div className="w-full h-1.5 bg-obsidian-800">
-                        <div className="w-[85%] h-full bg-financial-warning" />
-                      </div>
-                    </div>
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between text-foreground-muted">
-                        <span>Weekday Average</span>
-                        <span className="text-foreground">₹1,080</span>
-                      </div>
-                      <div className="w-full h-1.5 bg-obsidian-800">
-                        <div className="w-[42%] h-full bg-financial-positive" />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {current.evidenceType === "micro" && (
-                  <div className="space-y-3 font-mono text-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="text-foreground-muted">14 Micro Purchases</span>
-                      <span className="text-foreground font-semibold">₹3,840 Total</span>
-                    </div>
-                    <div className="grid grid-cols-7 gap-1 py-1">
-                      {Array.from({ length: 14 }).map((_, i) => (
-                        <div
-                          key={i}
-                          className="h-5 bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-[8px] text-foreground-dim"
-                        >
-                          ₹
+                      {barWidths[index] !== undefined && (
+                        <div aria-hidden="true" className="h-1.5 bg-background">
+                          <div className={index === 0 ? "h-full bg-foreground" : "h-full bg-foreground-dim"}
+                            style={{ width: (barWidths[index] / maxAverage) * 100 + "%" }} />
                         </div>
-                      ))}
+                      )}
                     </div>
-                  </div>
-                )}
-
-                {current.evidenceType === "forecast" && (
-                  <div className="space-y-3 font-mono text-xs">
-                    <div className="flex justify-between">
-                      <span className="text-foreground-muted">Current Burn</span>
-                      <span className="text-financial-danger font-semibold">₹372 / day</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-obsidian-800 overflow-hidden">
-                      <div className="w-[92%] h-full bg-financial-danger" />
-                    </div>
-                    <div className="text-[10px] text-financial-danger pt-1">
-                      Pacing +₹1,480 beyond monthly cap
-                    </div>
-                  </div>
-                )}
-
-                {current.evidenceType === "recurring" && (
-                  <div className="space-y-2.5 font-mono text-xs">
-                    <div className="flex justify-between text-foreground-muted">
-                      <span>Anthropic Claude Pro</span>
-                      <span className="text-foreground">₹1,750</span>
-                    </div>
-                    <div className="flex justify-between text-foreground-muted">
-                      <span>Apple One & iCloud</span>
-                      <span className="text-foreground">₹365</span>
-                    </div>
-                    <div className="flex justify-between text-foreground-muted">
-                      <span>Spotify & YouTube</span>
-                      <span className="text-foreground">₹375</span>
-                    </div>
-                  </div>
-                )}
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Section Bottom Stepper */}
-        <div className="max-w-7xl mx-auto w-full flex items-center justify-between border-t border-white/[0.06] pt-6 font-mono text-[11px] text-foreground-dim">
+        <div className="max-w-7xl mx-auto w-full flex items-center justify-between border-t border-line pt-6 font-mono text-xs text-foreground-dim">
           <div className="flex items-center gap-4 sm:gap-6 overflow-x-auto">
-            {INSIGHTS.map((item, idx) => (
+            {insights.map((item, idx) => (
               <button
-                key={item.id}
+                key={item.tag}
                 onClick={() => setActiveInsightIndex(idx)}
                 className={clsx(
                   "flex items-center gap-2 whitespace-nowrap transition-colors",
@@ -233,14 +172,14 @@ export const VeyraInsights: React.FC = () => {
                 <span
                   className={clsx(
                     "w-1.5 h-1.5 rounded-full",
-                    activeInsightIndex === idx ? "bg-financial-accent" : "bg-obsidian-700"
+                    activeInsightIndex === idx ? "bg-foreground-muted" : "bg-surface"
                   )}
                 />
                 <span>0{idx + 1}</span>
               </button>
             ))}
           </div>
-          <span className="hidden sm:inline text-[10px]">Scroll to progress</span>
+          <span className="hidden sm:inline text-xs">Scroll to progress</span>
         </div>
       </div>
     </div>

@@ -22,8 +22,9 @@ export const DisplayNumber: React.FC<DisplayNumberProps> = ({
   status = "neutral",
 }) => {
   const formatted = formatCurrency(amount, { currency, compact, showSign });
-  const symbol = formatted.slice(0, 1);
-  const numberPart = formatted.slice(1);
+  const symbolLength = /^[−+-]/.test(formatted) ? 2 : 1;
+  const symbol = formatted.slice(0, symbolLength);
+  const numberPart = formatted.slice(symbolLength);
 
   const sizeClasses = {
     sm: "text-xl md:text-2xl font-light tracking-tight",
@@ -35,10 +36,10 @@ export const DisplayNumber: React.FC<DisplayNumberProps> = ({
 
   const statusColors = {
     neutral: "text-foreground",
-    positive: "text-financial-positive",
-    warning: "text-financial-warning",
-    danger: "text-financial-danger",
-    accent: "text-financial-accent",
+    positive: "text-foreground-muted",
+    warning: "text-foreground-muted",
+    danger: "bg-background text-danger",
+    accent: "text-foreground-dim",
   };
 
   return (
@@ -50,7 +51,7 @@ export const DisplayNumber: React.FC<DisplayNumberProps> = ({
         className
       )}
     >
-      <span className="opacity-60 text-[0.8em] font-normal mr-0.5 select-none">{symbol}</span>
+      <span className="text-[0.8em] font-normal mr-0.5 select-none">{symbol}</span>
       <span className="font-medium tracking-tighter tabular-nums">{numberPart}</span>
     </div>
   );

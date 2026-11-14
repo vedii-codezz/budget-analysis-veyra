@@ -41,7 +41,7 @@ export const DataTooltip: React.FC<DataTooltipProps> = ({
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.15 }}
             className={clsx(
-              "absolute z-50 px-2.5 py-1.5 bg-obsidian-900 border border-white/10 text-foreground font-mono text-[11px] whitespace-nowrap shadow-xl pointer-events-none",
+              "absolute z-50 px-2.5 py-1.5 bg-surface border border-line text-foreground font-mono text-[11px] whitespace-nowrap shadow-xl shadow-background/70 pointer-events-none",
               positionClasses[position]
             )}
           >

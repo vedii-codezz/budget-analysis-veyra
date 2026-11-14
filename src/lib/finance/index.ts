@@ -1,208 +1,334 @@
-import {
-  Transaction,
-  CategoryBudget,
-  SavingsGoal,
-  FinancialHealthScore,
-  TransactionCategory,
-} from "@/types/finance";
+import type { CategoryBudget, Transaction } from "../../types/finance";
 
-/**
- * Calculate total spend from a list of transactions
- */
-export function calculateMonthlySpend(transactions: Transaction[]): number {
-  return transactions.reduce((acc, t) => acc + (t.amount > 0 ? t.amount : 0), 0);
+export const budgets: CategoryBudget[] = [
+  {
+    category: "Housing & Utilities",
+    allocated: 25000,
+  },
+  {
+    category: "Food & Dining",
+    allocated: 12000,
+  },
+  {
+    category: "Shopping & Lifestyle",
+    allocated: 8000,
+  },
+  {
+    category: "Transport & Fuel",
+    allocated: 5000,
+  },
+  {
+    category: "Subscriptions & SaaS",
+    allocated: 3000,
+  },
+  {
+    category: "Entertainment & Leisure",
+    allocated: 4000,
+  },
+  {
+    category: "Health & Wellness",
+    allocated: 4000,
+  },
+  {
+    category: "Investments & Savings",
+    allocated: 25000,
+  },
+  { category: "Travel", allocated: 5000 },
+  { category: "Other", allocated: 2000 },
+];
+
+export const transactions: Transaction[] = [
+  {
+    id: "tx-01",
+    title: "Apartment Rent & Maintenance",
+    merchant: "DLF CyberCity Properties",
+    amount: 22000,
+    category: "Housing & Utilities",
+    type: "expense",
+    date: "2026-08-01",
+    isRecurring: true,
+  },
+  {
+    id: "tx-02",
+    title: "Electricity & Fiber Internet",
+    merchant: "Tata Power & Airtel Xstream",
+    amount: 2500,
+    category: "Housing & Utilities",
+    type: "expense",
+    date: "2026-08-03",
+    isRecurring: true,
+  },
+  {
+    id: "tx-03",
+    title: "Gourmet Dinner",
+    merchant: "Indian Accent",
+    amount: 3420,
+    category: "Food & Dining",
+    type: "expense",
+    date: "2026-08-05",
+  },
+  {
+    id: "tx-04",
+    title: "Weekly Organic Groceries",
+    merchant: "Blinkit Instant",
+    amount: 1300,
+    category: "Food & Dining",
+    type: "expense",
+    date: "2026-08-07",
+  },
+  {
+    id: "tx-05",
+    title: "Cab Rides & Airport Transit",
+    merchant: "Uber Premier",
+    amount: 1100,
+    category: "Transport & Fuel",
+    type: "expense",
+    date: "2026-08-08",
+  },
+  {
+    id: "tx-06",
+    title: "Designer Minimalist Jacket",
+    merchant: "Zara Studios",
+    amount: 4330,
+    category: "Shopping & Lifestyle",
+    type: "expense",
+    date: "2026-08-10",
+  },
+  {
+    id: "tx-07",
+    title: "Apple One Premier Subscription",
+    merchant: "Apple Services",
+    amount: 365,
+    category: "Subscriptions & SaaS",
+    type: "expense",
+    date: "2026-08-11",
+    isRecurring: true,
+  },
+  {
+    id: "tx-08",
+    title: "Claude Pro & Dev Cloud",
+    merchant: "Anthropic PBC",
+    amount: 1750,
+    category: "Subscriptions & SaaS",
+    type: "expense",
+    date: "2026-08-12",
+    isRecurring: true,
+  },
+  {
+    id: "tx-09",
+    title: "Specialty Coffee Beans & Pourover",
+    merchant: "Blue Tokai Coffee",
+    amount: 560,
+    category: "Food & Dining",
+    type: "expense",
+    date: "2026-08-14",
+  },
+  {
+    id: "tx-10",
+    title: "Weekend IMAX Cinema Experience",
+    merchant: "PVR Directors Cut",
+    amount: 1850,
+    category: "Entertainment & Leisure",
+    type: "expense",
+    date: "2026-08-15",
+  },
+  {
+    id: "tx-11",
+    title: "Fuel & Highway Tolls",
+    merchant: "Indian Oil Premium",
+    amount: 1290,
+    category: "Transport & Fuel",
+    type: "expense",
+    date: "2026-08-16",
+  },
+  {
+    id: "tx-12",
+    title: "Annual Gym & Spa Pass",
+    merchant: "Cult.fit Elite",
+    amount: 2800,
+    category: "Health & Wellness",
+    type: "expense",
+    date: "2026-08-17",
+    oneOff: true,
+  },
+  {
+    id: "tx-13",
+    title: "Index Fund SIP (Nifty 50)",
+    merchant: "Zerodha Coin",
+    amount: 15000,
+    category: "Investments & Savings",
+    type: "investment",
+    date: "2026-08-18",
+    isRecurring: true,
+  },
+  {
+    id: "tx-14",
+    title: "Global Tech Index SIP",
+    merchant: "Groww Investments",
+    amount: 10000,
+    category: "Investments & Savings",
+    type: "investment",
+    date: "2026-08-18",
+    isRecurring: true,
+  },
+  {
+    id: "tx-15",
+    title: "Weekend Brunch with Friends",
+    merchant: "Olive Bar & Kitchen",
+    amount: 2010,
+    category: "Food & Dining",
+    type: "expense",
+    date: "2026-08-22",
+  },
+  {
+    id: "tx-16",
+    title: "Noise Cancelling Headphones Accessory",
+    merchant: "Croma Electronics",
+    amount: 1830,
+    category: "Shopping & Lifestyle",
+    type: "expense",
+    date: "2026-08-21",
+  },
+  {
+    id: "tx-17",
+    title: "Spotify Duo & Youtube Premium",
+    merchant: "Google & Spotify",
+    amount: 375,
+    category: "Subscriptions & SaaS",
+    type: "expense",
+    date: "2026-08-22",
+    isRecurring: true,
+  },
+  {
+    id: "tx-18",
+    title: "Cocktails & Jazz Night",
+    merchant: "The Piano Man Club",
+    amount: 760,
+    category: "Entertainment & Leisure",
+    type: "expense",
+    date: "2026-08-23",
+  },
+  { id: "micro-1", title: "Quick groceries", merchant: "Blinkit", amount: 260, category: "Food & Dining", type: "expense", date: "2026-08-07" },
+  { id: "micro-2", title: "Evening snack", merchant: "Blinkit", amount: 280, category: "Food & Dining", type: "expense", date: "2026-08-07" },
+  { id: "micro-3", title: "Chai and toast", merchant: "Blue Tokai", amount: 275, category: "Food & Dining", type: "expense", date: "2026-08-14" },
+  { id: "micro-4", title: "Coffee refill", merchant: "Blue Tokai", amount: 285, category: "Food & Dining", type: "expense", date: "2026-08-14" },
+  { id: "micro-5", title: "Chai with friends", merchant: "Olive Bar & Kitchen", amount: 265, category: "Food & Dining", type: "expense", date: "2026-08-22" },
+  { id: "micro-6", title: "Brunch pastries", merchant: "Olive Bar & Kitchen", amount: 285, category: "Food & Dining", type: "expense", date: "2026-08-22" },
+  { id: "micro-7", title: "Highway toll", merchant: "FASTag", amount: 260, category: "Transport & Fuel", type: "expense", date: "2026-08-16" },
+  { id: "micro-8", title: "Parking", merchant: "Highway Plaza", amount: 280, category: "Transport & Fuel", type: "expense", date: "2026-08-16" },
+  { id: "micro-9", title: "Auto to metro", merchant: "Uber Auto", amount: 270, category: "Transport & Fuel", type: "expense", date: "2026-08-08" },
+  { id: "micro-10", title: "Last-mile auto", merchant: "Uber Auto", amount: 280, category: "Transport & Fuel", type: "expense", date: "2026-08-08" },
+  { id: "micro-11", title: "Socks", merchant: "Zara Studios", amount: 275, category: "Shopping & Lifestyle", type: "expense", date: "2026-08-10" },
+  { id: "micro-12", title: "Canvas tote", merchant: "Zara Studios", amount: 285, category: "Shopping & Lifestyle", type: "expense", date: "2026-08-10" },
+  { id: "micro-13", title: "Jazz night snacks", merchant: "The Piano Man Club", amount: 260, category: "Entertainment & Leisure", type: "expense", date: "2026-08-23" },
+  { id: "micro-14", title: "Cover charge", merchant: "The Piano Man Club", amount: 280, category: "Entertainment & Leisure", type: "expense", date: "2026-08-23" },
+  { id: "salary", title: "Monthly Salary", merchant: "Payroll", amount: 95000, category: "Other", type: "income", date: "2026-08-01" },
+];
+
+export const monthStart = "2026-08-01";
+export const monthEnd = "2026-08-31";
+export const monthDays = 31;
+export const cashRetainedTarget = 30;
+export const microThreshold = 300;
+
+const essentialCategories = new Set(["Housing & Utilities", "Transport & Fuel", "Health & Wellness"]);
+const sum = (entries: Transaction[]) => entries.reduce((total, entry) => total + Math.round(entry.amount * 100), 0) / 100;
+const percent = (part: number, whole: number) => whole > 0 ? part / whole * 100 : 0;
+const dayOfMonth = (date: string) => Number(date.slice(-2));
+export const weekday = (date: string) => new Date(date).getUTCDay();
+const clamp = (value: number) => Math.min(1, Math.max(0, value));
+
+export function isMonthDate(value: string) {
+  return /^2026-08-(0[1-9]|[12][0-9]|3[01])$/.test(value);
 }
 
-/**
- * Calculate spend grouped by category
- */
-export function calculateCategorySpend(
-  transactions: Transaction[]
-): Record<TransactionCategory, number> {
-  const result: Partial<Record<TransactionCategory, number>> = {};
-
-  for (const t of transactions) {
-    if (t.amount > 0) {
-      result[t.category] = (result[t.category] || 0) + t.amount;
-    }
-  }
-
-  return result as Record<TransactionCategory, number>;
+export function isValidEntry(entry: Omit<Transaction, "id">) {
+  const minorUnits = Math.round(entry.amount * 100);
+  return typeof entry.title === "string" && entry.title.trim().length > 0
+    && typeof entry.merchant === "string"
+    && typeof entry.date === "string" && isMonthDate(entry.date)
+    && typeof entry.amount === "number" && Number.isSafeInteger(minorUnits) && minorUnits > 0
+    && (entry.type === "expense" || entry.type === "income")
+    && (entry.oneOff === undefined || typeof entry.oneOff === "boolean")
+    && budgets.some((budget) => budget.category === entry.category);
 }
 
-/**
- * Calculate absolute savings given income and total spend
- */
-export function calculateSavings(income: number, totalSpend: number): number {
-  return Math.max(0, income - totalSpend);
+export function outflowsThroughDay(entries: Transaction[], day: number) {
+  return sum(entries.filter((entry) => entry.type !== "income" && dayOfMonth(entry.date) <= day));
 }
 
-/**
- * Calculate savings rate percentage (0 - 100%)
- */
-export function calculateSavingsRate(income: number, totalSpend: number): number {
-  if (income <= 0) return 0;
-  const savings = income - totalSpend;
-  return Math.max(0, Math.min(100, (savings / income) * 100));
-}
-
-/**
- * Calculate budget usage per category
- */
-export function calculateBudgetUsage(
-  categorySpend: Record<string, number>,
-  budgets: CategoryBudget[]
-) {
-  return budgets.map((b) => {
-    const spent = categorySpend[b.category] || 0;
-    const percentage = b.allocated > 0 ? (spent / b.allocated) * 100 : 0;
-    const remaining = b.allocated - spent;
-    const isOverspent = remaining < 0;
-
-    let status: "healthy" | "warning" | "exceeded" = "healthy";
-    if (percentage >= 100) status = "exceeded";
-    else if (percentage >= 80) status = "warning";
-
+export function deriveFinance(entries: Transaction[]) {
+  const expenses = entries.filter((entry) => entry.type === "expense");
+  const investments = entries.filter((entry) => entry.type === "investment");
+  const income = sum(entries.filter((entry) => entry.type === "income"));
+  const consumption = sum(expenses);
+  const invested = sum(investments);
+  const deployed = sum([...expenses, ...investments]);
+  const cashRetained = Math.round((income - deployed) * 100) / 100;
+  const cashRetainedRate = percent(cashRetained, income);
+  const savedAndInvestedRate = percent(invested + cashRetained, income);
+  const essentials = expenses.filter((entry) => essentialCategories.has(entry.category));
+  const lifestyle = expenses.filter((entry) => !essentialCategories.has(entry.category));
+  const river = {
+    essentials: sum(essentials),
+    lifestyle: sum(lifestyle),
+    invested,
+    cashRetained,
+  };
+  const categorySpend = Object.fromEntries(budgets.map(({ category }) => [
+    category, sum(entries.filter((entry) => entry.type !== "income" && entry.category === category)),
+  ]));
+  const budgetUsage = budgets.map((budget) => {
+    const spent = categorySpend[budget.category];
+    const percentage = percent(spent, budget.allocated);
     return {
-      ...b,
-      spent,
-      remaining,
-      percentage,
-      isOverspent,
-      status,
+      ...budget, spent, percentage,
+      status: percentage > 100 ? "exceeded" : percentage > 90 ? "warning" : "healthy",
     };
   });
-}
-
-/**
- * Calculate average daily spend
- */
-export function calculateAverageDailySpend(
-  totalSpend: number,
-  daysPassed: number
-): number {
-  if (daysPassed <= 0) return 0;
-  return totalSpend / daysPassed;
-}
-
-/**
- * Forecast month-end spend based on current daily pace
- */
-export function forecastMonthEndSpend(
-  dailyAvg: number,
-  daysInMonth: number = 30
-): number {
-  return dailyAvg * daysInMonth;
-}
-
-/**
- * Detect spending spikes (transactions higher than mean + 2*stdDev or fixed threshold)
- */
-export function detectSpendingSpikes(
-  transactions: Transaction[],
-  threshold = 3000
-): Transaction[] {
-  return transactions.filter((t) => t.amount >= threshold);
-}
-
-/**
- * Identify recurring transactions (subscriptions or regular bills)
- */
-export function identifyRecurringTransactions(
-  transactions: Transaction[]
-): Transaction[] {
-  return transactions.filter((t) => t.isRecurring);
-}
-
-/**
- * Calculate comprehensive financial health score (0-100)
- * Evaluates:
- * 1. Savings Health (weight 35%): >= 30% savings rate is optimal
- * 2. Budget Discipline (weight 25%): % of categories within budget
- * 3. Expense Stability (weight 20%): low volatility and controlled discretionary spend
- * 4. Goal Progress (weight 20%): aggregate progress towards savings targets
- */
-export function calculateFinancialHealth(
-  income: number,
-  totalSpend: number,
-  budgets: CategoryBudget[],
-  goals: SavingsGoal[],
-  transactions: Transaction[]
-): FinancialHealthScore {
-  // 1. Savings Health (0-100)
-  const savingsRate = calculateSavingsRate(income, totalSpend);
-  const savingsHealth = Math.min(100, Math.round((savingsRate / 35) * 100));
-
-  // 2. Budget Discipline (0-100)
-  const categorySpend = calculateCategorySpend(transactions);
-  let withinBudgetCount = 0;
-  budgets.forEach((b) => {
-    const spent = categorySpend[b.category] || 0;
-    if (spent <= b.allocated) withinBudgetCount++;
-  });
-  const budgetDiscipline =
-    budgets.length > 0 ? Math.round((withinBudgetCount / budgets.length) * 100) : 100;
-
-  // 3. Expense Stability (0-100)
-  const nonEssentialCategories: TransactionCategory[] = [
-    "Shopping & Lifestyle",
-    "Entertainment & Leisure",
-  ];
-  const discretionarySpend = transactions
-    .filter((t) => nonEssentialCategories.includes(t.category))
-    .reduce((acc, t) => acc + t.amount, 0);
-  const discretionaryRatio = income > 0 ? discretionarySpend / income : 0;
-  const expenseStability = Math.max(0, Math.min(100, Math.round((1 - discretionaryRatio / 0.4) * 100)));
-
-  // 4. Goal Progress (0-100)
-  let totalGoalTarget = 0;
-  let totalGoalCurrent = 0;
-  goals.forEach((g) => {
-    totalGoalTarget += g.targetAmount;
-    totalGoalCurrent += g.currentAmount;
-  });
-  const goalProgress =
-    totalGoalTarget > 0
-      ? Math.min(100, Math.round((totalGoalCurrent / totalGoalTarget) * 100))
-      : 80;
-
-  // Composite Weighted Score
-  const score = Math.round(
-    savingsHealth * 0.35 +
-    budgetDiscipline * 0.25 +
-    expenseStability * 0.20 +
-    goalProgress * 0.20
-  );
-
-  let tier: FinancialHealthScore["tier"] = "STABLE";
-  let summary = "Financial metrics are balanced with steady cash flow.";
-
-  if (score >= 85) {
-    tier = "EXCELLENT";
-    summary = "Exceptional financial velocity. High savings rate and disciplined allocation.";
-  } else if (score >= 75) {
-    tier = "STRONG";
-    summary = "Solid financial trajectory. Budget adherence is well maintained.";
-  } else if (score >= 60) {
-    tier = "STABLE";
-    summary = "Controlled cash flow. Minor discretionary adjustments recommended.";
-  } else if (score >= 45) {
-    tier = "ATTENTION";
-    summary = "Elevated burn rate detected in discretionary categories.";
-  } else {
-    tier = "CRITICAL";
-    summary = "Budget caps exceeded. Immediate spending consolidation needed.";
-  }
+  const discretionary = lifestyle.filter((entry) => !entry.oneOff && !entry.isRecurring);
+  const elapsedDays = Math.max(1, ...expenses.filter((entry) => !entry.oneOff).map((entry) => dayOfMonth(entry.date)));
+  const isWeekend = (date: string) => [0, 6].includes(weekday(date));
+  const weekendDays = Array.from({ length: elapsedDays }, (_, i) =>
+    isWeekend(`${monthStart.slice(0, 7)}-${String(i + 1).padStart(2, "0")}`)
+  ).filter(Boolean).length;
+  const weekendAvg = sum(discretionary.filter((entry) => isWeekend(entry.date))) / (weekendDays || 1);
+  const weekdayAvg = sum(discretionary.filter((entry) => !isWeekend(entry.date))) / (elapsedDays - weekendDays || 1);
+  const weekendPremiumPct = weekdayAvg > 0 ? (weekendAvg / weekdayAvg - 1) * 100 : null;
+  const weekendDescription = (format: (value: number) => string) =>
+    `Saturday & Sunday discretionary spend averaged ${format(weekendAvg)} per day vs ${format(weekdayAvg)} on weekdays.`;
+  const microEntries = expenses.filter((entry) => entry.amount < microThreshold);
+  const microTotal = sum(microEntries);
+  const microPurchases = { entries: microEntries, count: microEntries.length, total: microTotal, share: percent(microTotal, consumption) };
+  const foodDaily = sum(expenses.filter((entry) => entry.category === "Food & Dining" && !entry.oneOff)) / elapsedDays;
+  const foodForecast = foodDaily * monthDays;
+  const foodCap = budgets.find((budget) => budget.category === "Food & Dining")!.allocated;
+  const foodPacingPct = percent(foodForecast, foodCap);
+  const recurring = expenses.filter((entry) => entry.isRecurring && entry.category === "Subscriptions & SaaS");
+  const stability = 1 - clamp(percent(sum(discretionary), income) / 40);
+  const investmentTarget = budgets.find((budget) => budget.category === "Investments & Savings")!.allocated;
+  const signals = [
+    { id: "retention", title: "Cash retained", weight: 35, ratio: clamp(cashRetainedRate / cashRetainedTarget),
+      desc: `${cashRetainedRate.toFixed(1)}% cash retained against a ${cashRetainedTarget}% target.` },
+    { id: "budget", title: "Budget Discipline", weight: 25,
+      ratio: budgetUsage.filter((budget) => budget.status !== "exceeded").length / budgetUsage.length,
+      desc: "Share of category caps met." },
+    { id: "stability", title: "Expense Stability", weight: 20, ratio: stability,
+      desc: "Discretionary spend, excluding one-offs and recurring bills, against a 40% of income threshold." },
+    { id: "investment", title: "Investment Progress", weight: 20, ratio: clamp(invested / investmentTarget),
+      desc: "Investment contributions as a share of the monthly investment target." },
+  ].map((signal) => ({ ...signal, points: Math.round(signal.weight * signal.ratio) }));
+  const base = 0;
+  const score = signals.reduce((total, signal) => total + signal.points, base);
+  const tier = score >= 85 ? "EXCELLENT" : score >= 75 ? "STRONG" : score >= 60 ? "STABLE" : score >= 45 ? "ATTENTION" : "CRITICAL";
 
   return {
-    score,
-    tier,
-    metrics: {
-      savingsHealth,
-      budgetDiscipline,
-      expenseStability,
-      goalProgress,
-    },
-    summary,
+    income, consumption, invested, deployed, cashRetained, cashRetainedRate, savedAndInvestedRate,
+    river, essentials, lifestyle, investments, categorySpend, budgetUsage, elapsedDays,
+    weekendAvg, weekdayAvg, weekendPremiumPct, weekendDescription, microPurchases,
+    foodDaily, foodForecast, foodCap, foodPacingPct, recurring, recurringTotal: sum(recurring),
+    health: { base, score, tier, signals, summary: cashRetained < 0 ? "Outflows exceed monthly income." : signals[0].desc },
   };
 }
+
+export const income = deriveFinance(transactions).income;

@@ -1,5 +1,6 @@
 "use client";
 
+import { cashRetainedTarget } from "@/lib/finance";
 import React, { useEffect, useRef, useState } from "react";
 import { registerGSAP } from "@/lib/animation/gsap";
 import { useFinanceStore } from "@/store/finance";
@@ -10,19 +11,13 @@ import { ArrowDownRight, Layers, Sparkles, TrendingUp } from "lucide-react";
 import { clsx } from "clsx";
 
 export const ScrollStory: React.FC = () => {
+  const { income, consumption: spend, cashRetained: savings, cashRetainedRate: savingsRate, river, invested, savedAndInvestedRate } = useFinanceStore((s) => s.metrics);
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
   const [activeStep, setActiveStep] = useState(0);
 
-  const income = useFinanceStore((s) => s.income);
-  const getMonthlySpend = useFinanceStore((s) => s.getMonthlySpend);
-  const getSavings = useFinanceStore((s) => s.getSavings);
-  const getSavingsRate = useFinanceStore((s) => s.getSavingsRate);
   const reducedMotion = usePreferencesStore((s) => s.reducedMotion);
 
-  const spend = getMonthlySpend();
-  const savings = getSavings();
-  const savingsRate = getSavingsRate();
 
   const storySteps = [
     {
@@ -34,8 +29,8 @@ export const ScrollStory: React.FC = () => {
       status: "neutral" as const,
       caption: "Gross capital generated across primary income sources this month.",
       submetrics: [
-        { label: "Salary Credit", val: "₹95,000" },
-        { label: "Tax Deductions", val: "Pre-settled" },
+        { label: "Total Inflow", val: formatCurrency(income) },
+
       ],
     },
     {
@@ -47,34 +42,34 @@ export const ScrollStory: React.FC = () => {
       status: "warning" as const,
       caption: "Essential living, lifestyle choices, and recurring commitments settled.",
       submetrics: [
-        { label: "Essential Living", val: "₹27,000" },
-        { label: "Discretionary Spend", val: "₹31,420" },
+        { label: "Essential Living", val: formatCurrency(river.essentials) },
+        { label: "Lifestyle Spend", val: formatCurrency(river.lifestyle) },
       ],
     },
     {
       id: "step-3",
       tag: "CAPITAL PRESERVATION",
-      headline: "YOU SAVED",
+      headline: "CASH RETAINED",
       amount: savings,
       isPercentage: false,
-      status: "positive" as const,
-      caption: "Net surplus retained for wealth compounding and emergency reserves.",
+      status: savings < 0 ? "danger" as const : "positive" as const,
+      caption: savings < 0 ? "Over budget. Outflows exceeded income." : "Cash left after expenses and investments.",
       submetrics: [
-        { label: "Direct Wealth SIPs", val: "₹25,000" },
-        { label: "Liquid Buffer", val: "₹11,580" },
+        { label: "Direct Wealth SIPs", val: formatCurrency(invested) },
+        { label: "Cash retained", val: formatCurrency(savings) },
       ],
     },
     {
       id: "step-4",
       tag: "FINANCIAL EFFICIENCY",
-      headline: "SAVINGS RATE",
+      headline: "CASH RETAINED RATE",
       amount: savingsRate,
       isPercentage: true,
-      status: "positive" as const,
-      caption: "Your capital retention efficiency exceeds 78% of urban professionals.",
+      status: savings < 0 ? "danger" as const : "positive" as const,
+      caption: `Saved + invested accounts for ${formatPercentage(savedAndInvestedRate)} of income.`,
       submetrics: [
-        { label: "Benchmark Target", val: "30.0%" },
-        { label: "Current Delta", val: `+${(savingsRate - 30).toFixed(1)}%` },
+        { label: "Benchmark Target", val: formatPercentage(cashRetainedTarget) },
+        { label: "Current Delta", val: `${(savingsRate - cashRetainedTarget).toFixed(1).replace("-", "−")} pts` },
       ],
     },
   ];
@@ -114,13 +109,13 @@ export const ScrollStory: React.FC = () => {
   const currentStory = storySteps[activeStep];
 
   return (
-    <div ref={containerRef} id="story" className="relative w-full bg-obsidian-950">
+    <div ref={containerRef} id="story" className="relative w-full bg-background">
       <div
         ref={triggerRef}
         className="min-h-screen w-full flex flex-col justify-between py-24 px-6 sm:px-8 md:px-12 lg:px-16"
       >
         {/* Story Section Top Marker */}
-        <div className="max-w-7xl mx-auto w-full flex items-center justify-between border-b border-white/[0.06] pb-6">
+        <div className="max-w-7xl mx-auto w-full flex items-center justify-between border-b border-line pb-6">
           <SectionLabel index="02" title="Scroll-Driven Trajectory" tag="CHOREOGRAPHED REVEAL" />
           <div className="flex items-center gap-2 font-mono text-xs text-foreground-muted">
             <span className="text-foreground font-semibold">0{activeStep + 1}</span>
@@ -134,7 +129,7 @@ export const ScrollStory: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             {/* Left Narrative Text */}
             <div className="lg:col-span-8 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 font-mono text-[10px] tracking-mega uppercase bg-white/[0.03] border border-white/[0.08] text-financial-accent">
+              <div className="inline-flex items-center gap-2 px-3 py-1 font-mono text-[10px] tracking-mega uppercase bg-surface border border-line text-foreground-muted">
                 <Sparkles className="w-3 h-3" />
                 {currentStory.tag}
               </div>
@@ -147,8 +142,9 @@ export const ScrollStory: React.FC = () => {
                 <div
                   className={clsx(
                     "text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-light tracking-tightest tabular-nums transition-all duration-500",
-                    currentStory.status === "positive" && "text-financial-positive",
-                    currentStory.status === "warning" && "text-financial-warning",
+                    currentStory.status === "positive" && "text-foreground-muted",
+                    currentStory.status === "warning" && "text-foreground-muted",
+                    currentStory.status === "danger" && "text-danger",
                     currentStory.status === "neutral" && "text-foreground"
                   )}
                 >
@@ -165,13 +161,13 @@ export const ScrollStory: React.FC = () => {
 
             {/* Right Meta Telemetry Block */}
             <div className="lg:col-span-4 flex flex-col justify-center">
-              <div className="bg-obsidian-900/60 backdrop-blur-2xl border border-white/[0.08] p-6 md:p-8 space-y-6">
-                <div className="flex items-center justify-between border-b border-white/[0.06] pb-4">
-                  <span className="font-mono text-xs uppercase tracking-widest text-foreground-dim flex items-center gap-2">
+              <div className="bg-surface backdrop-blur-2xl border border-line p-6 md:p-8 space-y-6">
+                <div className="flex items-center justify-between border-b border-line pb-4">
+                  <span className="font-mono text-xs uppercase tracking-widest text-foreground-muted flex items-center gap-2">
                     <Layers className="w-3.5 h-3.5 text-foreground-muted" />
                     DECONSTRUCTION
                   </span>
-                  <span className="font-mono text-[10px] text-financial-positive">
+                  <span className="font-mono text-[10px] text-foreground-muted">
                     HEALTHY
                   </span>
                 </div>
@@ -186,14 +182,14 @@ export const ScrollStory: React.FC = () => {
                 </div>
 
                 {/* Progress Visualizer */}
-                <div className="pt-4 border-t border-white/[0.06] space-y-2">
-                  <div className="flex justify-between font-mono text-[10px] text-foreground-dim uppercase">
+                <div className="pt-4 border-t border-line space-y-2">
+                  <div className="flex justify-between font-mono text-[10px] text-foreground-muted uppercase">
                     <span>Flow Progression</span>
                     <span>{Math.round(((activeStep + 1) / storySteps.length) * 100)}%</span>
                   </div>
-                  <div className="w-full h-1 bg-obsidian-700 overflow-hidden">
+                  <div className="w-full h-1 bg-surface overflow-hidden">
                     <div
-                      className="h-full bg-financial-accent transition-all duration-500 ease-out"
+                      className="h-full bg-foreground-muted transition-all duration-500 ease-out"
                       style={{
                         width: `${((activeStep + 1) / storySteps.length) * 100}%`,
                       }}
@@ -206,7 +202,7 @@ export const ScrollStory: React.FC = () => {
         </div>
 
         {/* Story Section Bottom Marker */}
-        <div className="max-w-7xl mx-auto w-full flex items-center justify-between border-t border-white/[0.06] pt-6 font-mono text-[11px] text-foreground-dim">
+        <div className="max-w-7xl mx-auto w-full flex items-center justify-between border-t border-line pt-6 font-mono text-[11px] text-foreground-dim">
           <div className="flex items-center gap-6">
             {storySteps.map((s, idx) => (
               <button
@@ -219,7 +215,7 @@ export const ScrollStory: React.FC = () => {
                     : "text-foreground-dim hover:text-foreground-muted"
                 )}
               >
-                <span className={clsx("w-1.5 h-1.5 rounded-full", activeStep === idx ? "bg-financial-accent" : "bg-obsidian-600")} />
+                <span className={clsx("w-1.5 h-1.5 rounded-full", activeStep === idx ? "bg-foreground-muted" : "bg-surface")} />
                 0{idx + 1} {s.headline}
               </button>
             ))}

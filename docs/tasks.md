@@ -43,3 +43,9 @@
 - [ ] Add an `og:image` meta tag.
 - [ ] Add a large Twitter card.
 - [ ] Update the project README and write a case study.
+
+
+## Phase 5
+
+- [x] Centralize and apply the new palette to the dashboard, charts, and social preview.
+- [x] Test text contrast and document the palette and verification results.

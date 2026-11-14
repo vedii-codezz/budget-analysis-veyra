@@ -53,28 +53,33 @@ export const CustomCursor: React.FC = () => {
   const isHovered = variant === "hover";
   const hasLabel = Boolean(label);
 
-  const size = hasLabel ? 76 : isHovered ? 40 : 12;
+  const explore = variant === "explore";
+  const size = explore ? 60 : hasLabel ? 76 : isHovered ? 40 : 12;
+
+  const palette = getComputedStyle(document.documentElement);
+  const text = palette.getPropertyValue("--text").trim();
+  const background = palette.getPropertyValue("--bg").trim();
 
   return (
     <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
       {/* Outer Ring / Cursor Bubble */}
       <motion.div
-        className="fixed top-0 left-0 rounded-full flex items-center justify-center pointer-events-none text-center font-mono text-[9px] uppercase tracking-widest leading-none select-none backdrop-blur-[1px]"
+        className="fixed top-0 left-0 rounded-full flex items-center justify-center pointer-events-none text-center font-mono text-[9px] uppercase tracking-wide leading-none select-none backdrop-blur-[1px]"
         animate={{
-          x: mousePosition.x - size / 2,
-          y: mousePosition.y - size / 2,
+          x: explore ? mousePosition.x + (mousePosition.x + 80 > window.innerWidth ? -72 : 14) : mousePosition.x - size / 2,
+          y: explore ? mousePosition.y - 36 : mousePosition.y - size / 2,
           width: size,
-          height: size,
+          height: explore ? 22 : size,
           backgroundColor: hasLabel
-            ? "rgba(255, 255, 255, 0.95)"
+            ? text
             : isHovered
-            ? "rgba(255, 255, 255, 0.08)"
-            : "rgba(255, 255, 255, 0.9)",
-          color: hasLabel ? "#050505" : "#ffffff",
+            ? text + "14"
+            : text + "e6",
+          color: hasLabel ? background : text,
           borderColor: hasLabel
-            ? "rgba(255, 255, 255, 0.4)"
+            ? text + "66"
             : isHovered
-            ? "rgba(255, 255, 255, 0.3)"
+            ? text + "4d"
             : "transparent",
           borderWidth: isHovered && !hasLabel ? 1 : 0,
         }}
@@ -90,7 +95,7 @@ export const CustomCursor: React.FC = () => {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            className="font-medium px-2 truncate"
+            className="font-medium px-1 truncate"
           >
             {label}
           </motion.span>

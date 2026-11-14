@@ -17,13 +17,13 @@ export const GlassPanel: React.FC<GlassPanelProps> = ({
 }) => {
   const variants = {
     default:
-      "bg-obsidian-900/60 backdrop-blur-xl border border-white/[0.06] hover:border-white/[0.12] transition-colors duration-500",
+      "bg-surface backdrop-blur-xl border border-line hover:border-line transition-colors duration-500",
     elevated:
-      "bg-obsidian-800/80 backdrop-blur-2xl border border-white/[0.09] shadow-2xl shadow-black/80",
+      "bg-surface backdrop-blur-2xl border border-line shadow-2xl shadow-background/80",
     subtle:
-      "bg-obsidian-950/40 backdrop-blur-md border border-white/[0.03]",
+      "bg-surface backdrop-blur-md border border-line",
     accent:
-      "bg-obsidian-900/80 backdrop-blur-xl border border-financial-accent/30 shadow-lg shadow-financial-accent/5",
+      "bg-surface backdrop-blur-xl border border-line shadow-lg shadow-background/70",
   };
 
   return (

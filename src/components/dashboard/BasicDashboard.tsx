@@ -15,65 +15,26 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { clsx } from "clsx";
-import { TransactionCategory } from "@/types/finance";
+import { monthDays, outflowsThroughDay } from "@/lib/finance";
+import { TransactionDialog } from "./TransactionDialog";
 
 interface BasicDashboardProps {
   onOpenStory?: () => void;
 }
 
 export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) => {
+  const { income, deployed: totalSpend, cashRetained: savings, cashRetainedRate: savingsRate, budgetUsage, health } = useFinanceStore((s) => s.metrics);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>("ALL");
   const [hoveredTxId, setHoveredTxId] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [scrubDay, setScrubDay] = useState<number>(24);
+  const [scrubDay, setScrubDay] = useState<number>(monthDays);
 
-  // Form State for quick transaction addition
-  const [newTitle, setNewTitle] = useState("");
-  const [newMerchant, setNewMerchant] = useState("");
-  const [newAmount, setNewAmount] = useState("");
-  const [newCategory, setNewCategory] = useState<TransactionCategory>("Food & Dining");
-
-  const income = useFinanceStore((s) => s.income);
   const transactions = useFinanceStore((s) => s.transactions);
   const budgets = useFinanceStore((s) => s.budgets);
-  const addTransaction = useFinanceStore((s) => s.addTransaction);
-  const getMonthlySpend = useFinanceStore((s) => s.getMonthlySpend);
-  const getSavings = useFinanceStore((s) => s.getSavings);
-  const getSavingsRate = useFinanceStore((s) => s.getSavingsRate);
-  const getBudgetUsage = useFinanceStore((s) => s.getBudgetUsage);
-  const getFinancialHealth = useFinanceStore((s) => s.getFinancialHealth);
-
-  const totalSpend = getMonthlySpend();
-  const savings = getSavings();
-  const savingsRate = getSavingsRate();
-  const budgetUsage = getBudgetUsage();
-  const health = getFinancialHealth();
-
-  const handleAddSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTitle || !newAmount || isNaN(Number(newAmount))) return;
-
-    addTransaction({
-      title: newTitle,
-      merchant: newMerchant || newTitle,
-      amount: Number(newAmount),
-      category: newCategory,
-      date: new Date().toISOString().split("T")[0],
-    });
-
-    setNewTitle("");
-    setNewMerchant("");
-    setNewAmount("");
-    setIsAddModalOpen(false);
-  };
-
-  // Cumulative spend up to scrub day
-  const cumulativeSpendAtDay = transactions
-    .filter((t) => {
-      const day = parseInt(t.date.split("-")[2], 10) || 1;
-      return day <= scrubDay;
-    })
-    .reduce((acc, t) => acc + t.amount, 0);
+  const reset = useFinanceStore((s) => s.reset);
+  const storageError = useFinanceStore((s) => s.storageError);
+  const cumulativeSpendAtDay = outflowsThroughDay(transactions, scrubDay);
+  const deficit = savings < 0;
 
   const filteredTransactions =
     selectedCategoryFilter === "ALL"
@@ -83,11 +44,11 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
   return (
     <section
       id="dashboard"
-      className="relative w-full py-24 md:py-36 px-6 sm:px-8 md:px-12 lg:px-16 bg-obsidian-950 text-foreground border-t border-white/[0.06]"
+      className="relative w-full py-24 md:py-36 px-6 sm:px-8 md:px-12 lg:px-16 bg-background text-foreground border-t border-line"
     >
       <div className="max-w-7xl mx-auto space-y-24">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/[0.08] pb-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-line pb-8">
           <div>
             <SectionLabel index="07" title="Executive Ledger" tag="Command Center" />
             <h2 className="text-4xl md:text-5xl lg:text-7xl font-extralight tracking-tightest mt-3 text-foreground">
@@ -95,6 +56,10 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
             </h2>
           </div>
           <div className="flex items-center gap-3">
+            <button type="button" className="font-mono text-xs text-foreground-muted hover:text-foreground"
+              onClick={() => { reset(); setScrubDay(monthDays); setSelectedCategoryFilter("ALL"); }}>
+              Reset demo data
+            </button>
             <MagneticButton
               variant="primary"
               onClick={() => setIsAddModalOpen(true)}
@@ -105,20 +70,21 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
           </div>
         </div>
 
+        {storageError && <p role="status" className="text-foreground-muted text-sm">Browser storage is unavailable. Changes may be lost on reload.</p>}
         {/* Asymmetric Macro Overview */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           {/* Main Large Inflow/Outflow Balance */}
           <div className="lg:col-span-7 space-y-8">
             <div className="border-l-2 border-foreground/30 pl-6 space-y-2">
               <span className="font-mono text-xs uppercase tracking-mega text-foreground-muted">
-                NET CAPITAL PRESERVATION
+                CASH RETAINED
               </span>
               <div className="py-1">
-                <DisplayNumber amount={savings} size="hero" status="positive" />
+                <DisplayNumber amount={savings} size="hero" status={deficit ? "danger" : "positive"} />
               </div>
               <p className="text-foreground-muted font-light text-sm max-w-md">
-                Retained surplus across active earnings. Your savings velocity stands at{" "}
-                <span className="text-financial-positive font-medium">
+                {deficit ? "Over budget. " : ""}Cash retained rate{" "}
+                <span className={deficit ? "text-danger font-medium" : "text-foreground-muted font-medium"}>
                   {formatPercentage(savingsRate)}
                 </span>
                 .
@@ -126,12 +92,11 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
             </div>
 
             {/* Asymmetrical Metric Strip */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4 border-t border-white/[0.06]">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4 border-t border-line">
               <FinancialMetric
                 label="Gross Inflow"
                 value={income}
                 statusColor="neutral"
-                change="+100%"
                 trend="neutral"
                 caption="Primary cashflow"
               />
@@ -158,9 +123,9 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
           {/* Right Column: Timeline Scrubbing */}
           <div className="lg:col-span-5 space-y-6">
             <GlassPanel variant="default" className="p-8 space-y-6">
-              <div className="flex items-center justify-between border-b border-white/[0.06] pb-4 font-mono text-xs text-foreground-muted uppercase tracking-wider">
+              <div className="flex items-center justify-between border-b border-line pb-4 font-mono text-xs text-foreground-muted uppercase tracking-wider">
                 <span>Pace Scrubber</span>
-                <span className="text-financial-accent font-medium">
+                <span className="text-foreground-muted font-medium">
                   Aug {scrubDay < 10 ? `0${scrubDay}` : scrubDay}
                 </span>
               </div>
@@ -176,22 +141,23 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
                 </div>
 
                 <input
+                  aria-label="Outflow pace by day"
                   type="range"
                   min="1"
-                  max="31"
+                  max={monthDays}
                   value={scrubDay}
                   onChange={(e) => setScrubDay(Number(e.target.value))}
-                  className="w-full h-1.5 bg-obsidian-700 accent-foreground cursor-pointer"
+                  className="w-full h-1.5 bg-surface accent-foreground cursor-pointer"
                 />
 
-                <div className="flex justify-between font-mono text-[10px] text-foreground-dim uppercase">
+                <div className="flex justify-between font-mono text-xs text-foreground-muted uppercase">
                   <span>Aug 01</span>
                   <span>Aug 15</span>
                   <span>Aug 31</span>
                 </div>
               </div>
 
-              <p className="text-xs text-foreground-dim leading-relaxed pt-2 border-t border-white/[0.04]">
+              <p className="text-xs text-foreground-muted leading-relaxed pt-2 border-t border-line">
                 Scrub through calendar days to observe how micro-purchases and fixed commitments accumulated across the month.
               </p>
             </GlassPanel>
@@ -199,7 +165,7 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
         </div>
 
         {/* Category Budget Allocation */}
-        <div className="space-y-6 pt-12 border-t border-white/[0.08]">
+        <div className="space-y-6 pt-12 border-t border-line">
           <div className="flex items-center justify-between">
             <span className="font-mono text-xs uppercase tracking-mega text-foreground-muted">
               BUDGET ALLOCATION ADHERENCE
@@ -222,30 +188,34 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
                     </span>
                     <span
                       className={clsx(
-                        "text-[10px] px-1.5 py-0.5",
+                        "text-xs px-1.5 py-0.5",
                         b.status === "exceeded"
-                          ? "bg-financial-danger/20 text-financial-danger font-semibold"
+                          ? "bg-background text-danger font-semibold"
                           : b.status === "warning"
-                          ? "bg-financial-warning/20 text-financial-warning font-semibold"
-                          : "bg-white/[0.05] text-foreground-muted"
+                          ? "bg-background text-warn font-semibold"
+                          : "bg-surface text-foreground-muted"
                       )}
                     >
-                      {Math.round(b.percentage)}%
+                      {formatPercentage(b.percentage)}{b.status === "exceeded" ? " · Breached" : ""}
                     </span>
                   </div>
                 </div>
-                <div className="w-full h-1 bg-obsidian-800 overflow-hidden">
+                <div className="relative w-full h-1 bg-surface">
                   <div
                     className={clsx(
                       "h-full transition-all duration-500",
                       b.status === "exceeded"
-                        ? "bg-financial-danger"
+                        ? "bg-danger"
                         : b.status === "warning"
-                        ? "bg-financial-warning"
-                        : "bg-financial-positive"
+                        ? "bg-warn"
+                        : "bg-foreground-muted"
                     )}
-                    style={{ width: `${Math.min(100, b.percentage)}%` }}
+                    style={{ width: `${b.percentage / Math.max(100, b.percentage) * 100}%` }}
                   />
+                  {b.status === "exceeded" && (
+                    <span title="Budget cap" className="absolute -top-1 h-3 w-px bg-foreground"
+                      style={{ left: `${100 / b.percentage * 100}%` }} />
+                  )}
                 </div>
               </div>
             ))}
@@ -253,7 +223,7 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
         </div>
 
         {/* Transaction Ledger Table (Calm & Readable) */}
-        <div className="space-y-6 pt-12 border-t border-white/[0.08]">
+        <div className="space-y-6 pt-12 border-t border-line">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <ReceiptText className="w-4 h-4 text-foreground-muted" />
@@ -263,8 +233,8 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
             </div>
 
             {/* Filter tags */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-none font-mono text-[11px]">
-              {["ALL", "Food & Dining", "Housing & Utilities", "Shopping & Lifestyle", "Subscriptions & SaaS"].map(
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-none font-mono text-xs">
+              {["ALL", ...budgets.map((budget) => budget.category)].map(
                 (cat) => (
                   <button
                     key={cat}
@@ -273,7 +243,7 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
                       "px-3 py-1 border whitespace-nowrap transition-colors duration-150",
                       selectedCategoryFilter === cat
                         ? "border-foreground bg-foreground text-background font-medium"
-                        : "border-white/[0.08] text-foreground-muted hover:text-foreground"
+                        : "border-line text-foreground-muted hover:text-foreground"
                     )}
                   >
                     {cat}
@@ -284,11 +254,10 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
           </div>
 
           {/* Ledger Table */}
-          <div className="border border-white/[0.06] overflow-hidden">
-            <div className="divide-y divide-white/[0.04]">
+          <div className="border border-line overflow-hidden">
+            <div className="divide-y divide-line">
               {filteredTransactions.map((tx) => {
                 const isHovered = hoveredTxId === tx.id;
-                const hasHover = hoveredTxId !== null;
 
                 return (
                   <div
@@ -298,26 +267,24 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
                     className={clsx(
                       "flex flex-col sm:flex-row sm:items-center justify-between p-4 md:px-6 transition-all duration-200 gap-2 font-mono text-xs",
                       isHovered
-                        ? "bg-white/[0.04] pl-4 md:pl-5"
-                        : hasHover
-                        ? "opacity-50"
-                        : "hover:bg-white/[0.02]"
+                        ? "bg-surface pl-4 md:pl-5"
+                        : "hover:bg-surface"
                     )}
                   >
                     <div className="flex items-center gap-4">
-                      <span className="text-foreground-dim w-20">{tx.date}</span>
+                      <span className="text-foreground-muted w-20">{tx.date}</span>
                       <div>
                         <div className="text-foreground font-medium">{tx.title}</div>
-                        <div className="text-[11px] text-foreground-muted">{tx.merchant}</div>
+                        <div className="text-xs text-foreground-muted">{tx.merchant}</div>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between sm:justify-end gap-4">
-                      <span className="text-[10px] px-2 py-0.5 border border-white/[0.06] text-foreground-dim">
+                      <span className="text-xs px-2 py-0.5 border border-line text-foreground-muted">
                         {tx.category}
                       </span>
                       <span className="text-foreground font-medium text-sm tabular-nums">
-                        -₹{tx.amount.toLocaleString("en-IN")}
+                        {tx.type === "income" ? "+" : "−"}{formatCurrency(tx.amount, { showDecimals: !Number.isInteger(tx.amount) })}
                       </span>
                     </div>
                   </div>
@@ -329,7 +296,7 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
 
         {/* Visual Decompression & VEYRA Story Invitation (Directive #29) */}
         {onOpenStory && (
-          <div className="pt-20 pb-8 text-center space-y-6 border-t border-white/[0.06]">
+          <div className="pt-20 pb-8 text-center space-y-6 border-t border-line">
             <span className="font-mono text-xs tracking-mega uppercase text-foreground-dim block">
               YOUR MONTH HAS A STORY.
             </span>
@@ -350,92 +317,7 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
         )}
       </div>
 
-      {/* Add Transaction Modal */}
-      {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="bg-obsidian-900 border border-white/[0.12] p-8 max-w-md w-full shadow-2xl space-y-6">
-            <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
-              <span className="font-mono text-xs uppercase tracking-widest text-foreground font-medium">
-                Record Capital Outflow
-              </span>
-              <button
-                onClick={() => setIsAddModalOpen(false)}
-                className="font-mono text-xs text-foreground-dim hover:text-foreground"
-              >
-                [ESC / CLOSE]
-              </button>
-            </div>
-
-            <form onSubmit={handleAddSubmit} className="space-y-4 font-mono text-xs">
-              <div className="space-y-1.5">
-                <label className="text-foreground-muted block">Transaction Title</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Flight to Mumbai"
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full bg-obsidian-950 border border-white/[0.1] px-3.5 py-2.5 text-foreground focus:border-foreground focus:outline-none"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-foreground-muted block">Merchant / Payee</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Air India"
-                  value={newMerchant}
-                  onChange={(e) => setNewMerchant(e.target.value)}
-                  className="w-full bg-obsidian-950 border border-white/[0.1] px-3.5 py-2.5 text-foreground focus:border-foreground focus:outline-none"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-foreground-muted block">Amount (INR ₹)</label>
-                <input
-                  type="number"
-                  required
-                  placeholder="e.g. 6420"
-                  value={newAmount}
-                  onChange={(e) => setNewAmount(e.target.value)}
-                  className="w-full bg-obsidian-950 border border-white/[0.1] px-3.5 py-2.5 text-foreground focus:border-foreground focus:outline-none"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-foreground-muted block">Category</label>
-                <select
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value as TransactionCategory)}
-                  className="w-full bg-obsidian-950 border border-white/[0.1] px-3.5 py-2.5 text-foreground focus:border-foreground focus:outline-none"
-                >
-                  {budgets.map((b) => (
-                    <option key={b.category} value={b.category}>
-                      {b.category}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="pt-4 flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 border border-white/[0.08] text-foreground-muted hover:text-foreground"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 bg-foreground text-background font-medium hover:bg-foreground/90 transition-colors"
-                >
-                  Commit Entry
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {isAddModalOpen && <TransactionDialog onClose={() => setIsAddModalOpen(false)} />}
     </section>
   );
 };
