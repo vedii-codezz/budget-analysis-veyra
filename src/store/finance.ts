@@ -27,7 +27,8 @@ export const useFinanceStore = create<FinanceState>((set) => ({
     try {
       const saved: unknown = JSON.parse(localStorage.getItem(storageKey) ?? "[]");
       const ids = new Set(transactions.map(({ id }) => id));
-      const additions = Array.isArray(saved) ? saved.filter((entry): entry is Transaction => {
+      const additions = Array.isArray(saved) ? saved.map((entry) => entry?.type === "income" && entry.category === "Other"
+        ? { ...entry, category: "Income" } : entry).filter((entry): entry is Transaction => {
         if (!entry || typeof entry.id !== "string" || ids.has(entry.id) || !isValidEntry(entry)) return false;
         ids.add(entry.id);
         return true;

@@ -222,7 +222,7 @@ export const transactions: Transaction[] = [
   { id: "micro-12", title: "Canvas tote", merchant: "Zara Studios", amount: 285, category: "Shopping & Lifestyle", type: "expense", date: "2026-08-10" },
   { id: "micro-13", title: "Jazz night snacks", merchant: "The Piano Man Club", amount: 260, category: "Entertainment & Leisure", type: "expense", date: "2026-08-23" },
   { id: "micro-14", title: "Cover charge", merchant: "The Piano Man Club", amount: 280, category: "Entertainment & Leisure", type: "expense", date: "2026-08-23" },
-  { id: "salary", title: "Monthly Salary", merchant: "Payroll", amount: 95000, category: "Other", type: "income", date: "2026-08-01" },
+  { id: "salary", title: "Monthly Salary", merchant: "Payroll", amount: 95000, category: "Income", type: "income", date: "2026-08-01" },
 ];
 
 export const monthStart = "2026-08-01";
@@ -250,7 +250,8 @@ export function isValidEntry(entry: Omit<Transaction, "id">) {
     && typeof entry.amount === "number" && Number.isSafeInteger(minorUnits) && minorUnits > 0
     && (entry.type === "expense" || entry.type === "income")
     && (entry.oneOff === undefined || typeof entry.oneOff === "boolean")
-    && budgets.some((budget) => budget.category === entry.category);
+    && (entry.type === "income" ? entry.category === "Income"
+      : budgets.some((budget) => budget.category === entry.category && budget.category !== "Investments & Savings"));
 }
 
 export function outflowsThroughDay(entries: Transaction[], day: number) {

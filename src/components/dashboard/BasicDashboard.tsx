@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useFinanceStore } from "@/store/finance";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { DisplayNumber } from "@/components/ui/DisplayNumber";
@@ -9,6 +9,7 @@ import { GlassPanel } from "@/components/ui/GlassPanel";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { formatCurrency, formatPercentage } from "@/lib/utils/currency";
 import {
+  AlertTriangle,
   Plus,
   ReceiptText,
   Play,
@@ -26,6 +27,7 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
   const { income, deployed: totalSpend, cashRetained: savings, cashRetainedRate: savingsRate, budgetUsage, health } = useFinanceStore((s) => s.metrics);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>("ALL");
   const [hoveredTxId, setHoveredTxId] = useState<string | null>(null);
+  const addButton = useRef<HTMLButtonElement | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [scrubDay, setScrubDay] = useState<number>(monthDays);
 
@@ -62,7 +64,10 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
             </button>
             <MagneticButton
               variant="primary"
-              onClick={() => setIsAddModalOpen(true)}
+              onClick={(event) => {
+                addButton.current = event.currentTarget;
+                setIsAddModalOpen(true);
+              }}
               cursorLabel="ADD"
             >
               <Plus className="w-4 h-4" /> Add Transaction
@@ -83,7 +88,8 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
                 <DisplayNumber amount={savings} size="hero" status={deficit ? "danger" : "positive"} />
               </div>
               <p className="text-foreground-muted font-light text-sm max-w-md">
-                {deficit ? "Over budget. " : ""}Cash retained rate{" "}
+                {deficit && <span className="flex items-center gap-1 text-danger"><AlertTriangle aria-hidden="true" className="h-4 w-4" /> Over budget</span>}
+                Cash retained rate{" "}
                 <span className={deficit ? "text-danger font-medium" : "text-foreground-muted font-medium"}>
                   {formatPercentage(savingsRate)}
                 </span>
@@ -234,7 +240,7 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
 
             {/* Filter tags */}
             <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-none font-mono text-xs">
-              {["ALL", ...budgets.map((budget) => budget.category)].map(
+              {["ALL", "Income", ...budgets.map((budget) => budget.category)].map(
                 (cat) => (
                   <button
                     key={cat}
@@ -317,7 +323,7 @@ export const BasicDashboard: React.FC<BasicDashboardProps> = ({ onOpenStory }) =
         )}
       </div>
 
-      {isAddModalOpen && <TransactionDialog onClose={() => setIsAddModalOpen(false)} />}
+      {isAddModalOpen && <TransactionDialog onClose={() => { setIsAddModalOpen(false); requestAnimationFrame(() => addButton.current?.focus()); }} />}
     </section>
   );
 };

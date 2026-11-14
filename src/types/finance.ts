@@ -8,7 +8,8 @@ export type TransactionCategory =
   | "Health & Wellness"
   | "Investments & Savings"
   | "Travel"
-  | "Other";
+  | "Other"
+  | "Income";
 
 export interface Transaction {
   id: string;

@@ -7,7 +7,7 @@ import { usePreferencesStore } from "@/store/preferences";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { DisplayNumber } from "@/components/ui/DisplayNumber";
 import { MagneticButton } from "@/components/ui/MagneticButton";
-import { ArrowDown, Compass, ShieldCheck, TrendingUp } from "lucide-react";
+import { AlertTriangle, ArrowDown, Compass, ShieldCheck, TrendingUp } from "lucide-react";
 import { formatPercentage } from "@/lib/utils/currency";
 
 export const CinematicHero: React.FC = () => {
@@ -184,7 +184,7 @@ export const CinematicHero: React.FC = () => {
                 />
               </div>
 
-              {availableLiquidity < 0 && <p className="inline-block bg-background text-danger font-mono text-xs">Over budget</p>}
+              {availableLiquidity < 0 && <p className="inline-flex items-center gap-1 bg-background text-danger font-mono text-xs"><AlertTriangle aria-hidden="true" className="h-4 w-4" /> Over budget</p>}
               <div className="pt-6 mt-6 border-t border-line flex items-center justify-between text-xs font-mono text-foreground-muted">
                 <div>
                   <span className="block text-[10px] text-foreground-muted uppercase tracking-wider">

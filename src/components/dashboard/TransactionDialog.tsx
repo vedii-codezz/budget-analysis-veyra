@@ -16,15 +16,15 @@ export function TransactionDialog({ onClose }: { onClose: () => void }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const addTransaction = useFinanceStore((s) => s.addTransaction);
   const [type, setType] = useState<"expense" | "income">("expense");
+  const [category, setCategory] = useState<TransactionCategory>("Food & Dining");
+  const categoryTouched = useRef(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     const element = dialog.current;
-    const trigger = document.activeElement;
     element?.showModal();
     return () => {
       element?.close();
-      if (trigger instanceof HTMLElement) trigger.focus();
     };
   }, []);
 
@@ -38,7 +38,7 @@ export function TransactionDialog({ onClose }: { onClose: () => void }) {
       amount: Number(fields.get("amount")),
       date: String(fields.get("date") ?? ""),
       type,
-      category: type === "income" ? "Other" as const : fields.get("category") as TransactionCategory,
+      category: type === "income" ? "Income" as const : category,
       oneOff: type === "expense" && fields.has("oneOff"),
     };
     if (!isValidEntry(entry)) {
@@ -61,12 +61,19 @@ export function TransactionDialog({ onClose }: { onClose: () => void }) {
           <label><input className="accent-foreground" type="radio" name="type" checked={type === "income"} onChange={() => setType("income")} /> Income</label>
         </fieldset>
         <label className="block">Transaction title<input autoFocus name="title" required className={fieldClass} /></label>
-        <label className="block">Merchant / payee<input name="merchant" className={fieldClass} /></label>
+        <label className="block">Merchant / payee
+          <input name="merchant" className={fieldClass} onChange={(event) => {
+            if (!categoryTouched.current) setCategory(/\bair india\b/i.test(event.target.value) ? "Travel" : "Food & Dining");
+          }} />
+        </label>
         <label className="block">Amount (INR)<input name="amount" type="number" min="0.01" step="0.01" required className={fieldClass} /></label>
         <label className="block">Date<input name="date" type="date" defaultValue={defaultDate()} min={monthStart} max={monthEnd} required className={fieldClass} /></label>
         {type === "expense" && <>
           <label className="block">Category
-            <select name="category" defaultValue="Food & Dining" className={fieldClass}>
+            <select name="category" value={category} className={fieldClass} onChange={(event) => {
+              categoryTouched.current = true;
+              setCategory(event.target.value as TransactionCategory);
+            }}>
               {budgets.filter(({ category }) => category !== "Investments & Savings").map(({ category }) =>
                 <option key={category}>{category}</option>
               )}

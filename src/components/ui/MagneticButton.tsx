@@ -12,7 +12,6 @@ interface MagneticButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEleme
   size?: "sm" | "md" | "lg";
   cursorLabel?: string;
   cursorVariant?: CursorVariant;
-  onClick?: () => void;
 }
 
 export const MagneticButton: React.FC<MagneticButtonProps> = ({
