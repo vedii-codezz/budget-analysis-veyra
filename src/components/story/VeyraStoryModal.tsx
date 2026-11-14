@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useFinanceStore } from "@/store/finance";
-import { formatCurrency, formatPercentage } from "@/lib/utils/currency";
+import { formatCurrency, formatPercentage, formatSignedNumber } from "@/lib/utils/currency";
 import {
   ArrowRight,
   ArrowLeft,
@@ -65,7 +65,7 @@ export const VeyraStoryModal: React.FC<VeyraStoryModalProps> = ({
       id: "slide-5",
       tag: "Pattern Discovery",
       title: "WEEKEND OUTFLOWS",
-      number: weekendPremiumPct === null ? "NO WEEKDAY BASELINE" : `${weekendPremiumPct > 0 ? "+" : ""}${formatPercentage(weekendPremiumPct, 0)}`,
+      number: weekendPremiumPct === null ? "NO WEEKDAY BASELINE" : formatSignedNumber(weekendPremiumPct, 0, "%"),
       caption: weekendDescription(formatCurrency),
     },
     {

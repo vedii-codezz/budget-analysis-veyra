@@ -1,5 +1,6 @@
 "use client";
 
+import { CalculationInfo, metricDefinitions } from "@/components/ui/FinanceDefinitions";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useFinanceStore } from "@/store/finance";
@@ -91,7 +92,7 @@ export const CashFlowRiver: React.FC = () => {
             <div className="pt-4 border-t border-line space-y-2 font-mono text-xs">
               <div className="flex justify-between text-foreground-muted">
                 <span>Preservation efficiency</span>
-                <span className="text-foreground-muted font-medium">{formatPercentage(savedAndInvestedRate)} Saved + invested</span>
+                <span className="text-foreground-muted font-medium">{formatPercentage(savedAndInvestedRate)} Saved + invested <CalculationInfo label="Saved + invested rate">{metricDefinitions.saved}</CalculationInfo></span>
               </div>
             </div>
           </div>

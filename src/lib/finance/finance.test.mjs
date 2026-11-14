@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { deriveFinance, transactions } from "./index.ts";
 
+import { formatSignedNumber } from "../utils/currency.ts";
+
 const metrics = deriveFinance(transactions);
 
 test("river balances to income, with cash retained as its liquid buffer", () => {
@@ -56,4 +58,12 @@ test("budget warning starts above 90 percent and breach starts above the cap", (
     }]);
     assert.equal(result.budgetUsage.find(({ category }) => category === "Other").status, status);
   }
+});
+
+test("benchmark delta uses a single sign and points", () => {
+  assert.equal(formatSignedNumber(metrics.cashRetainedRate - 30, 1, " pts"), String.fromCharCode(8722) + "11.1 pts");
+  assert.equal(formatSignedNumber(2, 1, " pts"), "+2.0 pts");
+  assert.equal(formatSignedNumber(-0.001, 1, " pts"), "0.0 pts");
+  assert.equal(metrics.health.base, 50);
+  assert.ok(metrics.health.signals.find(({ id }) => id === "retention").points < 0);
 });

@@ -1,5 +1,6 @@
 "use client";
 
+import { CalculationInfo, metricDefinitions } from "@/components/ui/FinanceDefinitions";
 import React, { useEffect, useRef } from "react";
 import { useFinanceStore } from "@/store/finance";
 import { usePreferencesStore } from "@/store/preferences";
@@ -119,7 +120,7 @@ export const CinematicHero: React.FC = () => {
         <SectionLabel index="01" title="Financial Matrix" tag="Demo data · August 2026" />
         <div className="font-mono text-[11px] text-foreground-dim flex items-center gap-4">
           <span className={`flex items-center gap-1 ${savingsRate < 0 ? "text-danger" : "text-foreground-muted"}`}>
-            {savingsRate >= 0 && <TrendingUp className="w-3 h-3" />} {formatPercentage(savingsRate)} Cash retained
+            {savingsRate >= 0 && <TrendingUp className="w-3 h-3" />} {formatPercentage(savingsRate)} Cash retained <CalculationInfo label="Cash retained rate">{metricDefinitions.cash}</CalculationInfo>
           </span>
         </div>
       </div>

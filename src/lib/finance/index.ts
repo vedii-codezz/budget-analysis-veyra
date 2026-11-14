@@ -308,17 +308,20 @@ export function deriveFinance(entries: Transaction[]) {
   const stability = 1 - clamp(percent(sum(discretionary), income) / 40);
   const investmentTarget = budgets.find((budget) => budget.category === "Investments & Savings")!.allocated;
   const signals = [
-    { id: "retention", title: "Cash retained", weight: 35, ratio: clamp(cashRetainedRate / cashRetainedTarget),
+    { id: "retention", title: "Savings Health", weight: 35, baseline: 25, ratio: clamp(cashRetainedRate / cashRetainedTarget),
       desc: `${cashRetainedRate.toFixed(1)}% cash retained against a ${cashRetainedTarget}% target.` },
-    { id: "budget", title: "Budget Discipline", weight: 25,
+    { id: "budget", title: "Budget Discipline", weight: 25, baseline: 10,
       ratio: budgetUsage.filter((budget) => budget.status !== "exceeded").length / budgetUsage.length,
       desc: "Share of category caps met." },
-    { id: "stability", title: "Expense Stability", weight: 20, ratio: stability,
+    { id: "stability", title: "Expense Stability", weight: 20, baseline: 7.5, ratio: stability,
       desc: "Discretionary spend, excluding one-offs and recurring bills, against a 40% of income threshold." },
-    { id: "investment", title: "Investment Progress", weight: 20, ratio: clamp(invested / investmentTarget),
+    { id: "investment", title: "Goal Progress", weight: 20, baseline: 7.5, ratio: clamp(invested / investmentTarget),
       desc: "Investment contributions as a share of the monthly investment target." },
-  ].map((signal) => ({ ...signal, points: Math.round(signal.weight * signal.ratio) }));
-  const base = 0;
+  ].map((signal) => {
+    const earned = Math.round(signal.weight * signal.ratio);
+    return { ...signal, earned, points: earned - signal.baseline };
+  });
+  const base = signals.reduce((total, signal) => total + signal.baseline, 0);
   const score = signals.reduce((total, signal) => total + signal.points, base);
   const tier = score >= 85 ? "EXCELLENT" : score >= 75 ? "STRONG" : score >= 60 ? "STABLE" : score >= 45 ? "ATTENTION" : "CRITICAL";
 

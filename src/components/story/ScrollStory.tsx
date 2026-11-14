@@ -6,7 +6,7 @@ import { registerGSAP } from "@/lib/animation/gsap";
 import { useFinanceStore } from "@/store/finance";
 import { usePreferencesStore } from "@/store/preferences";
 import { SectionLabel } from "@/components/ui/SectionLabel";
-import { formatCurrency, formatPercentage } from "@/lib/utils/currency";
+import { formatCurrency, formatPercentage, formatSignedNumber } from "@/lib/utils/currency";
 import { ArrowDownRight, Layers, Sparkles, TrendingUp } from "lucide-react";
 import { clsx } from "clsx";
 
@@ -69,7 +69,7 @@ export const ScrollStory: React.FC = () => {
       caption: `Saved + invested accounts for ${formatPercentage(savedAndInvestedRate)} of income.`,
       submetrics: [
         { label: "Benchmark Target", val: formatPercentage(cashRetainedTarget) },
-        { label: "Current Delta", val: `${(savingsRate - cashRetainedTarget).toFixed(1).replace("-", "−")} pts` },
+        { label: "Current Delta", val: formatSignedNumber(savingsRate - cashRetainedTarget, 1, " pts") },
       ],
     },
   ];
