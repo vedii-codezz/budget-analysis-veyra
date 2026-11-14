@@ -73,3 +73,11 @@ The card numbering above records the supplied deployment audit. The workspace so
 Tested combinations below 4.5:1 are unused for text: `--danger` on `--surface` (4.06:1), `--text-muted` on `--surface` (3.56:1), `--text-secondary` on `--line` (3.45:1), and `--bg` on `--line` (2.93:1).
 
 The production build passed with network access for the existing Google Fonts. All seven finance tests passed, including the 90% warning threshold and the 100% breach boundary. The 1200 x 630 social PNG was verified.
+
+## Preview follow-up · 2026-11-15
+
+- Local production build passed. Generated HTML includes the social image alt, large Twitter card, hero tagline, and Baseline 50.
+- Nine finance tests passed, including score reconciliation, river reconciliation, the signed benchmark delta, and the exact Flight to Mumbai scenario.
+- In the local production UI, Air India suggested Travel. Adding INR 24,000 showed a deficit of INR 6,080, lowered the score from 77 to 43, and showed Travel at 480% with a Breached label. The entry survived reload and Reset demo data removed it.
+- Keyboard checks opened the cash and micro-purchase help with Enter, closed it with Escape, and confirmed focus returned to Add Transaction after submit and Escape. The trajectory rendered the signed benchmark delta. The Motion toggle survived reload and the intro stayed dismissed.
+- The palette script checks the supported foreground/background pairs. A rendered-style audit identified an active nav label using muted text on the surface (3.56:1). Active links now use headline text, which measures 9.81:1 on the surface and 15.20:1 on the active page-background highlight. The unused failing pairs are recorded above.
