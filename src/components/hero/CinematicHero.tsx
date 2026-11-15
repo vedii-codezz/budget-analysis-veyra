@@ -22,7 +22,7 @@ export const CinematicHero: React.FC = () => {
     if (!canvas) return;
     const palette = getComputedStyle(document.documentElement);
     const particleColor = palette.getPropertyValue("--text").trim();
-    const glowColor = palette.getPropertyValue("--text-secondary").trim();
+    const glowColor = palette.getPropertyValue("--accent").trim();
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -180,7 +180,7 @@ export const CinematicHero: React.FC = () => {
                 <DisplayNumber
                   amount={availableLiquidity}
                   size="xl"
-                  status={availableLiquidity < 0 ? "danger" : "neutral"}
+                  status={availableLiquidity < 0 ? "danger" : "accent"}
                 />
               </div>
 
@@ -213,7 +213,7 @@ export const CinematicHero: React.FC = () => {
         <span className="hidden sm:inline">Scroll to explore financial trajectory</span>
         <a
           href="#story"
-          className="flex items-center gap-2 text-foreground hover:text-foreground-dim transition-colors duration-300 ml-auto sm:ml-0"
+          className="flex items-center gap-2 text-accent hover:text-foreground transition-colors duration-300 ml-auto sm:ml-0"
         >
           <span>Trajectory Sequence</span>
           <ArrowDown className="w-3.5 h-3.5 animate-bounce" />

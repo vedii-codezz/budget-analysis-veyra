@@ -81,3 +81,22 @@ The production build passed with network access for the existing Google Fonts. A
 - In the local production UI, Air India suggested Travel. Adding INR 24,000 showed a deficit of INR 6,080, lowered the score from 77 to 43, and showed Travel at 480% with a Breached label. The entry survived reload and Reset demo data removed it.
 - Keyboard checks opened the cash and micro-purchase help with Enter, closed it with Escape, and confirmed focus returned to Add Transaction after submit and Escape. The trajectory rendered the signed benchmark delta. The Motion toggle survived reload and the intro stayed dismissed.
 - The palette script checks the supported foreground/background pairs. A rendered-style audit identified an active nav label using muted text on the surface (3.56:1). Active links now use headline text, which measures 9.81:1 on the surface and 15.20:1 on the active page-background highlight. The unused failing pairs are recorded above.
+
+
+## Ink & Amber · 2026-11-15
+
+The palette check passed for all 13 active text/background pairs. Ratios below are rounded to two decimal places.
+
+| Text | Background | Contrast |
+| --- | --- | --- |
+| Text | Page / surface | 17.10:1 / 15.06:1 |
+| Secondary | Page / surface | 11.70:1 / 10.30:1 |
+| Muted | Page / surface | 5.93:1 / 5.22:1 |
+| Accent | Page / surface | 10.55:1 / 9.29:1 |
+| Page | Accent / text / secondary | 10.55:1 / 17.10:1 / 11.70:1 |
+| Danger | Page | 5.79:1 |
+| Warn | Page | 10.62:1 |
+
+Page-colored text on the line token measured 1.71:1. Universe labels now use secondary or headline text on the surface. The line token is used for outlines and markers. The source scan passed for hardcoded hex, RGB, HSL and standard Tailwind colors outside the token definition. The social preview was verified at 1200 × 630 with page, title and accent pixels from the new palette.
+
+Accent and warning have almost identical luminance. In grayscale, budget warnings retain the usage percentage, breaches retain the Breached label, and Attention and deficit states retain their status text and warning icon. This was checked against the component markup.

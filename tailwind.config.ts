@@ -21,6 +21,7 @@ const config: Config = {
           muted: token("text-secondary"),
           dim: token("text-muted"),
         },
+        accent: token("accent"),
         danger: token("danger"),
         warn: token("warn"),
       },
@@ -49,9 +50,9 @@ const config: Config = {
         mega: "0.3em",
       },
       backgroundImage: {
-        "radial-subtle": "radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--text-secondary) 3%, transparent) 0%, transparent 70%)",
-        "radial-accent": "radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--text-secondary) 8%, transparent) 0%, transparent 60%)",
-        "gradient-glass": "linear-gradient(135deg, color-mix(in srgb, var(--text-secondary) 4%, transparent) 0%, color-mix(in srgb, var(--text-secondary) 1%, transparent) 100%)",
+        "radial-subtle": "radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--accent) 3%, transparent) 0%, transparent 70%)",
+        "radial-accent": "radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--accent) 8%, transparent) 0%, transparent 60%)",
+        "gradient-glass": "linear-gradient(135deg, color-mix(in srgb, var(--accent) 4%, transparent) 0%, color-mix(in srgb, var(--accent) 1%, transparent) 100%)",
       },
       animation: {
         "pulse-slow": "pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite",

@@ -249,7 +249,7 @@ export const VeyraStoryModal: React.FC<VeyraStoryModalProps> = ({
         {currentSlide < totalSlides - 1 ? (
           <button
             onClick={nextSlide}
-            className="flex items-center gap-2 px-6 py-2.5 bg-foreground text-background font-medium hover:bg-foreground-muted transition-colors uppercase tracking-wider"
+            className="flex items-center gap-2 px-6 py-2.5 bg-accent text-background font-medium hover:bg-foreground transition-colors uppercase tracking-wider"
           >
             <span>Continue</span>
             <ArrowRight className="w-4 h-4" />
@@ -257,7 +257,7 @@ export const VeyraStoryModal: React.FC<VeyraStoryModalProps> = ({
         ) : (
           <button
             onClick={onClose}
-            className="flex items-center gap-2 px-6 py-2.5 bg-foreground text-background font-medium hover:bg-foreground-muted transition-colors uppercase tracking-wider"
+            className="flex items-center gap-2 px-6 py-2.5 bg-accent text-background font-medium hover:bg-foreground transition-colors uppercase tracking-wider"
           >
             <span>Done</span>
           </button>

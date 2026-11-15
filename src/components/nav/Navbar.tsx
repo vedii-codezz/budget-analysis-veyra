@@ -74,8 +74,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenStory }) => {
                 className={clsx(
                   "relative isolate px-3.5 py-1 font-mono text-xs tracking-wider uppercase transition-colors duration-300 rounded-full",
                   isActive
-                    ? "text-foreground font-medium"
-                    : "text-foreground-muted hover:text-foreground"
+                    ? "text-accent font-medium"
+                    : "text-foreground-dim hover:text-foreground"
                 )}
               >
                 {link.label}

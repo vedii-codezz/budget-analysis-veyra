@@ -39,7 +39,7 @@ export const DisplayNumber: React.FC<DisplayNumberProps> = ({
     positive: "text-foreground-muted",
     warning: "text-foreground-muted",
     danger: "bg-background text-danger",
-    accent: "text-foreground-dim",
+    accent: "text-accent",
   };
 
   return (

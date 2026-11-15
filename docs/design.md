@@ -6,6 +6,24 @@
 
 | Token | Value | Role |
 | --- | --- | --- |
+| `--bg` | `#0E0E10` | Page background and primary button labels |
+| `--surface` | `#1C1C20` | Cards, panels, dialogs, Universe bubbles, budget and score tracks |
+| `--line` | `#3A3A40` | Structural borders and the liquid buffer marker |
+| `--text-muted` | `#8E8E96` | Labels, captions, inactive navigation and the lower weekend or weekday bar |
+| `--text-secondary` | `#C9C9CF` | Body copy, positive values, bubble labels, budget fill and essentials marker |
+| `--text` | `#F4F1EA` | Headlines and key numbers |
+| `--accent` | `#F2B54A` | Active navigation, primary buttons, hero liquidity, score progress, links, focus and selected chart marks |
+| `--danger` | `#E5645A` | Deficits, overspending and breached caps |
+| `--warn` | `#B9C95B` | Caps above 90% through 100% and score Attention status |
+
+Secondary buttons use a transparent fill, a line border, and secondary text. Budget bars use a surface track and switch from secondary to warning above 90% and to danger above 100%. The higher weekend or weekday bar uses accent. Universe outlines descend from accent on the largest bubble through muted and line tones, with a low-opacity glow. Each bubble keeps its category and amount. The river uses secondary for essentials, muted for lifestyle, accent for wealth, and line for the liquid buffer. The existing icons, signed values, percentages and status labels carry meaning without hue.
+
+## Previous palette (replaced)
+
+### Green palette
+
+| Token | Value | Role |
+| --- | --- | --- |
 | `--bg` | `#12201A` | Page, inverse text on light fills, and the background behind semantic badges |
 | `--surface` | `#294239` | Cards, panels, dialogs, budget tracks, and the score track |
 | `--line` | `#4F6C62` | 1px borders, largest Spending Universe bubble, and the first river accent |
@@ -15,14 +33,7 @@
 | `--danger` | `#E8826F` | Negative balances, deficits, and breached caps |
 | `--warn` | `#D9B45A` | Caps above 90% through 100%, plus the score's ATTENTION badge |
 
-- Primary buttons use `--text` with `--bg` labels. Secondary buttons use transparent fills, `--line` borders, and `--text-secondary` labels.
-- Budget bars switch from `--text-secondary` to `--warn` above 90% and to `--danger` above 100%. The weekday bar uses `--text-muted`.
-- Spending Universe bubbles are ranked by amount. The largest uses `--line` with `--text` labels. The next uses `--text-muted` and smaller bubbles use `--text-secondary`, both with `--bg` labels. The hover glow sits outside the label area.
-- The river uses `--line`, `--text-muted`, `--text-secondary`, and `--text` for its four accents. Each bucket shows its name and amount.
-- The score ring uses `--surface` for the track and `--text-secondary` for progress. Score status combines text and an icon for attention and deficit.
-- Small labels use `--text-secondary` on panels. Semantic text uses `--bg` behind it. Run `node scripts/check-palette.mjs` to verify contrast and detect hardcoded colors outside the global stylesheet.
-
-## Previous palette (replaced)
+### Original palette
 
 These were the original theme values. The small-text dim token was later raised to `#9898a1` before this palette replacement.
 

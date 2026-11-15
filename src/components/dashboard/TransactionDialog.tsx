@@ -84,7 +84,7 @@ export function TransactionDialog({ onClose }: { onClose: () => void }) {
         {error && <p role="alert" className="text-foreground-muted">{error}</p>}
         <div className="flex justify-end gap-3 pt-3">
           <button type="button" onClick={onClose} className="border border-line px-4 py-2 text-foreground-muted">Cancel</button>
-          <button type="submit" className="bg-foreground px-5 py-2 font-medium text-background">Commit Entry</button>
+          <button type="submit" className="bg-accent px-5 py-2 font-medium text-background">Commit Entry</button>
         </div>
       </form>
     </dialog>

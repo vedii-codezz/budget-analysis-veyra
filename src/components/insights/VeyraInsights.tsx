@@ -146,7 +146,7 @@ export const VeyraInsights: React.FC = () => {
                       </div>
                       {barWidths[index] !== undefined && (
                         <div aria-hidden="true" className="h-1.5 bg-background">
-                          <div className={index === 0 ? "h-full bg-foreground" : "h-full bg-foreground-dim"}
+                          <div className={barWidths[index] > barWidths[1 - index] ? "h-full bg-accent" : "h-full bg-foreground-dim"}
                             style={{ width: (barWidths[index] / maxAverage) * 100 + "%" }} />
                         </div>
                       )}

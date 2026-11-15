@@ -60,7 +60,7 @@ export const VeyraScore: React.FC = () => {
             >
               <svg aria-hidden="true" viewBox="0 0 100 100" className="absolute inset-0 h-full w-full -rotate-90">
                 <circle cx="50" cy="50" r="49" pathLength="100" fill="none" stroke="var(--surface)" strokeWidth="1" />
-                <circle cx="50" cy="50" r="49" pathLength="100" fill="none" stroke="var(--text-secondary)"
+                <circle cx="50" cy="50" r="49" pathLength="100" fill="none" stroke="var(--accent)"
                   strokeWidth="1" strokeDasharray={health.score + " 100"} />
               </svg>
               <span className="font-mono text-[10px] tracking-mega uppercase text-foreground-muted mb-1">

@@ -8,15 +8,16 @@ const palette = Object.fromEntries(
   [...css.matchAll(/--([a-z-]+):\s*(#[a-f\d]{6});/gi)].map(([, token, hex]) => [token, hex]),
 );
 
-const allowed = [
-  ["text", "bg"], ["text", "surface"], ["text", "line"],
+const textPairs = [
+  ["text", "bg"], ["text", "surface"],
   ["text-secondary", "bg"], ["text-secondary", "surface"],
-  ["text-muted", "bg"],
-  ["bg", "text"], ["bg", "text-secondary"], ["bg", "text-muted"],
+  ["text-muted", "bg"], ["text-muted", "surface"],
+  ["accent", "bg"], ["accent", "surface"],
+  ["bg", "accent"], ["bg", "text"], ["bg", "text-secondary"],
   ["danger", "bg"], ["warn", "bg"],
 ];
-const rejected = [
-  ["danger", "surface"], ["text-muted", "surface"], ["text-secondary", "line"], ["bg", "line"],
+const unusedPairs = [
+  ["danger", "surface"], ["text-secondary", "line"], ["bg", "line"],
 ];
 
 function luminance(hex) {
@@ -33,16 +34,19 @@ function contrast([text, background]) {
   return (Math.max(foreground, surface) + 0.05) / (Math.min(foreground, surface) + 0.05);
 }
 
-for (const pair of [...allowed, ...rejected]) {
+for (const pair of textPairs) {
   const ratio = contrast(pair);
-  const expectedPass = allowed.includes(pair);
-  console.log(pair.join(" on "), ratio.toFixed(2), expectedPass ? "AA" : "unused");
-  assert.equal(ratio >= 4.5, expectedPass, pair.join(" on "));
+  console.log(pair.join(" on "), ratio.toFixed(2), "AA");
+  assert.ok(ratio >= 4.5, pair.join(" on "));
+}
+
+for (const pair of unusedPairs) {
+  console.log(pair.join(" on "), contrast(pair).toFixed(2), "unused");
 }
 
 function checkSource(path) {
   if (path === globalStyles) return;
-  assert.doesNotMatch(readFileSync(path, "utf8"), /#[a-f\d]{3,8}\b|\brgba?\(\s*\d/gi, path);
+  assert.doesNotMatch(readFileSync(path, "utf8"), /#[a-f\d]{3,8}\b|\b(?:rgba?|hsla?)\(\s*[-.\d]|\b(?:bg|text|border|fill|stroke|shadow|outline|ring)-(?:black|white|slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)(?=[\s/"-])/gi, path);
 }
 
 function walk(folder) {

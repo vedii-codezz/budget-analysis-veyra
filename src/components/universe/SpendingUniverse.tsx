@@ -191,7 +191,10 @@ export const SpendingUniverse: React.FC = () => {
               >
                 {nodes.map((node) => {
                   const rank = rankedNodes.indexOf(node);
-                  const fill = rank === 0 ? "var(--line)" : rank === 1 ? "var(--text-muted)" : "var(--text-secondary)";
+                  const outline = rank === 0 ? "var(--accent)"
+                    : rank === 1 ? "var(--text-muted)"
+                    : rank === 2 ? "color-mix(in srgb, var(--line), var(--text-muted))"
+                    : "var(--line)";
                   const size = getNodeSize(node.amount);
                   const isHovered = hoveredCategory === node.category;
                   const pctOfTotal =
@@ -239,24 +242,24 @@ export const SpendingUniverse: React.FC = () => {
                       <div
                         style={{
                           width: `${size}px`,
-                          backgroundColor: fill,
+                          borderColor: outline,
                           height: `${size}px`,
                         }}
-                        className="relative rounded-full flex flex-col items-center justify-center p-3 text-center transition-all duration-500 border border-line shadow-xl shadow-background/70"
+                        className="relative rounded-full flex flex-col items-center justify-center p-3 text-center transition-all duration-500 border border-line bg-surface shadow-xl shadow-background/70"
                       >
                         {/* Controlled Ambient Glow on Hover */}
                         <div
                           className={clsx(
-                            "absolute inset-0 rounded-full shadow-[0_0_22px_7px_var(--text-secondary)] pointer-events-none transition-opacity duration-300",
-                            isHovered ? "opacity-10" : "opacity-0"
+                            "absolute inset-0 rounded-full shadow-[0_0_22px_7px_var(--accent)] pointer-events-none transition-opacity duration-300",
+                            rank === 0 ? "opacity-25" : isHovered ? "opacity-10" : "opacity-0"
                           )}
                         />
 
                         {/* Clean Progressive Content */}
-                        <span className={clsx("relative font-mono text-[10px] sm:text-[11px] tracking-wider uppercase line-clamp-1", rank === 0 ? "text-foreground" : "text-background")}>
+                        <span className="relative font-mono text-[10px] sm:text-[11px] tracking-wider uppercase line-clamp-1 text-foreground-muted">
                           {node.category.split(" & ")[0]}
                         </span>
-                        <span className={clsx("relative text-sm sm:text-base md:text-lg font-light tracking-tight tabular-nums mt-0.5", rank === 0 ? "text-foreground" : "text-background")}>
+                        <span className="relative text-sm sm:text-base md:text-lg font-light tracking-tight tabular-nums mt-0.5 text-foreground">
                           {formatCurrency(node.amount, { compact: true })}
                         </span>
                       </div>
