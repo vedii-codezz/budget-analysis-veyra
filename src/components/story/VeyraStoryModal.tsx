@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useFinanceStore } from "@/store/finance";
-import { formatCurrency, formatPercentage } from "@/lib/utils/currency";
+import { formatCurrency, formatPercentage, formatSignedNumber } from "@/lib/utils/currency";
 import {
   ArrowRight,
   ArrowLeft,
@@ -65,7 +65,7 @@ export const VeyraStoryModal: React.FC<VeyraStoryModalProps> = ({
       id: "slide-5",
       tag: "Pattern Discovery",
       title: "WEEKEND OUTFLOWS",
-      number: weekendPremiumPct === null ? "NO WEEKDAY BASELINE" : `${weekendPremiumPct > 0 ? "+" : ""}${formatPercentage(weekendPremiumPct, 0)}`,
+      number: weekendPremiumPct === null ? "NO WEEKDAY BASELINE" : formatSignedNumber(weekendPremiumPct, 0, "%"),
       caption: weekendDescription(formatCurrency),
     },
     {
@@ -249,7 +249,7 @@ export const VeyraStoryModal: React.FC<VeyraStoryModalProps> = ({
         {currentSlide < totalSlides - 1 ? (
           <button
             onClick={nextSlide}
-            className="flex items-center gap-2 px-6 py-2.5 bg-foreground text-background font-medium hover:bg-foreground-muted transition-colors uppercase tracking-wider"
+            className="flex items-center gap-2 px-6 py-2.5 bg-accent text-background font-medium hover:bg-foreground transition-colors uppercase tracking-wider"
           >
             <span>Continue</span>
             <ArrowRight className="w-4 h-4" />
@@ -257,7 +257,7 @@ export const VeyraStoryModal: React.FC<VeyraStoryModalProps> = ({
         ) : (
           <button
             onClick={onClose}
-            className="flex items-center gap-2 px-6 py-2.5 bg-foreground text-background font-medium hover:bg-foreground-muted transition-colors uppercase tracking-wider"
+            className="flex items-center gap-2 px-6 py-2.5 bg-accent text-background font-medium hover:bg-foreground transition-colors uppercase tracking-wider"
           >
             <span>Done</span>
           </button>

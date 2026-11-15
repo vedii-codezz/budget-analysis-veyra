@@ -1,4 +1,6 @@
-import type { Metadata } from "next";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { CustomCursor } from "@/components/cursor/CustomCursor";
@@ -15,6 +17,11 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
   display: "swap",
 });
+
+const globalStyles = readFileSync(join(process.cwd(), "src/app/globals.css"), "utf8");
+const themeColor = globalStyles.match(/--bg:\s*(#[\da-f]{6});/i)?.[1];
+
+export const viewport: Viewport = { themeColor };
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://budget-analysis-veyra.vercel.app"),

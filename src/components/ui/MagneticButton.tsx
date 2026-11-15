@@ -12,7 +12,6 @@ interface MagneticButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEleme
   size?: "sm" | "md" | "lg";
   cursorLabel?: string;
   cursorVariant?: CursorVariant;
-  onClick?: () => void;
 }
 
 export const MagneticButton: React.FC<MagneticButtonProps> = ({
@@ -53,11 +52,11 @@ export const MagneticButton: React.FC<MagneticButtonProps> = ({
   };
 
   const baseStyles =
-    "relative inline-flex items-center justify-center font-mono text-xs tracking-widest uppercase transition-all duration-300 select-none overflow-hidden group focus-visible:outline focus-visible:outline-2 focus-visible:outline-foreground-muted";
+    "relative inline-flex items-center justify-center font-mono text-xs tracking-widest uppercase transition-all duration-300 select-none overflow-hidden group focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent";
 
   const variants = {
     primary:
-      "bg-foreground text-background font-medium hover:bg-foreground-muted border border-foreground/20 active:scale-98",
+      "bg-accent text-background font-medium hover:bg-foreground border border-line active:scale-98",
     secondary:
       "bg-transparent text-foreground-muted border border-line hover:bg-background active:scale-98",
     ghost:

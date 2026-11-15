@@ -1,12 +1,13 @@
 "use client";
 
+import { CalculationInfo, metricDefinitions } from "@/components/ui/FinanceDefinitions";
 import React, { useEffect, useRef } from "react";
 import { useFinanceStore } from "@/store/finance";
 import { usePreferencesStore } from "@/store/preferences";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { DisplayNumber } from "@/components/ui/DisplayNumber";
 import { MagneticButton } from "@/components/ui/MagneticButton";
-import { ArrowDown, Compass, ShieldCheck, TrendingUp } from "lucide-react";
+import { AlertTriangle, ArrowDown, Compass, ShieldCheck, TrendingUp } from "lucide-react";
 import { formatPercentage } from "@/lib/utils/currency";
 
 export const CinematicHero: React.FC = () => {
@@ -21,7 +22,7 @@ export const CinematicHero: React.FC = () => {
     if (!canvas) return;
     const palette = getComputedStyle(document.documentElement);
     const particleColor = palette.getPropertyValue("--text").trim();
-    const glowColor = palette.getPropertyValue("--text-secondary").trim();
+    const glowColor = palette.getPropertyValue("--accent").trim();
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -119,7 +120,7 @@ export const CinematicHero: React.FC = () => {
         <SectionLabel index="01" title="Financial Matrix" tag="Demo data · August 2026" />
         <div className="font-mono text-[11px] text-foreground-dim flex items-center gap-4">
           <span className={`flex items-center gap-1 ${savingsRate < 0 ? "text-danger" : "text-foreground-muted"}`}>
-            {savingsRate >= 0 && <TrendingUp className="w-3 h-3" />} {formatPercentage(savingsRate)} Cash retained
+            {savingsRate >= 0 && <TrendingUp className="w-3 h-3" />} {formatPercentage(savingsRate)} Cash retained <CalculationInfo label="Cash retained rate">{metricDefinitions.cash}</CalculationInfo>
           </span>
         </div>
       </div>
@@ -179,11 +180,11 @@ export const CinematicHero: React.FC = () => {
                 <DisplayNumber
                   amount={availableLiquidity}
                   size="xl"
-                  status={availableLiquidity < 0 ? "danger" : "neutral"}
+                  status={availableLiquidity < 0 ? "danger" : "accent"}
                 />
               </div>
 
-              {availableLiquidity < 0 && <p className="inline-block bg-background text-danger font-mono text-xs">Over budget</p>}
+              {availableLiquidity < 0 && <p className="inline-flex items-center gap-1 bg-background text-danger font-mono text-xs"><AlertTriangle aria-hidden="true" className="h-4 w-4" /> Over budget</p>}
               <div className="pt-6 mt-6 border-t border-line flex items-center justify-between text-xs font-mono text-foreground-muted">
                 <div>
                   <span className="block text-[10px] text-foreground-muted uppercase tracking-wider">
@@ -212,7 +213,7 @@ export const CinematicHero: React.FC = () => {
         <span className="hidden sm:inline">Scroll to explore financial trajectory</span>
         <a
           href="#story"
-          className="flex items-center gap-2 text-foreground hover:text-foreground-dim transition-colors duration-300 ml-auto sm:ml-0"
+          className="flex items-center gap-2 text-accent hover:text-foreground transition-colors duration-300 ml-auto sm:ml-0"
         >
           <span>Trajectory Sequence</span>
           <ArrowDown className="w-3.5 h-3.5 animate-bounce" />

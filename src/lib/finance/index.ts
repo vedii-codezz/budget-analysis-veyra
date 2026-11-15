@@ -222,7 +222,7 @@ export const transactions: Transaction[] = [
   { id: "micro-12", title: "Canvas tote", merchant: "Zara Studios", amount: 285, category: "Shopping & Lifestyle", type: "expense", date: "2026-08-10" },
   { id: "micro-13", title: "Jazz night snacks", merchant: "The Piano Man Club", amount: 260, category: "Entertainment & Leisure", type: "expense", date: "2026-08-23" },
   { id: "micro-14", title: "Cover charge", merchant: "The Piano Man Club", amount: 280, category: "Entertainment & Leisure", type: "expense", date: "2026-08-23" },
-  { id: "salary", title: "Monthly Salary", merchant: "Payroll", amount: 95000, category: "Other", type: "income", date: "2026-08-01" },
+  { id: "salary", title: "Monthly Salary", merchant: "Payroll", amount: 95000, category: "Income", type: "income", date: "2026-08-01" },
 ];
 
 export const monthStart = "2026-08-01";
@@ -250,7 +250,8 @@ export function isValidEntry(entry: Omit<Transaction, "id">) {
     && typeof entry.amount === "number" && Number.isSafeInteger(minorUnits) && minorUnits > 0
     && (entry.type === "expense" || entry.type === "income")
     && (entry.oneOff === undefined || typeof entry.oneOff === "boolean")
-    && budgets.some((budget) => budget.category === entry.category);
+    && (entry.type === "income" ? entry.category === "Income"
+      : budgets.some((budget) => budget.category === entry.category && budget.category !== "Investments & Savings"));
 }
 
 export function outflowsThroughDay(entries: Transaction[], day: number) {
@@ -308,17 +309,20 @@ export function deriveFinance(entries: Transaction[]) {
   const stability = 1 - clamp(percent(sum(discretionary), income) / 40);
   const investmentTarget = budgets.find((budget) => budget.category === "Investments & Savings")!.allocated;
   const signals = [
-    { id: "retention", title: "Cash retained", weight: 35, ratio: clamp(cashRetainedRate / cashRetainedTarget),
+    { id: "retention", title: "Savings Health", weight: 35, baseline: 25, ratio: clamp(cashRetainedRate / cashRetainedTarget),
       desc: `${cashRetainedRate.toFixed(1)}% cash retained against a ${cashRetainedTarget}% target.` },
-    { id: "budget", title: "Budget Discipline", weight: 25,
+    { id: "budget", title: "Budget Discipline", weight: 25, baseline: 10,
       ratio: budgetUsage.filter((budget) => budget.status !== "exceeded").length / budgetUsage.length,
       desc: "Share of category caps met." },
-    { id: "stability", title: "Expense Stability", weight: 20, ratio: stability,
+    { id: "stability", title: "Expense Stability", weight: 20, baseline: 7.5, ratio: stability,
       desc: "Discretionary spend, excluding one-offs and recurring bills, against a 40% of income threshold." },
-    { id: "investment", title: "Investment Progress", weight: 20, ratio: clamp(invested / investmentTarget),
+    { id: "investment", title: "Goal Progress", weight: 20, baseline: 7.5, ratio: clamp(invested / investmentTarget),
       desc: "Investment contributions as a share of the monthly investment target." },
-  ].map((signal) => ({ ...signal, points: Math.round(signal.weight * signal.ratio) }));
-  const base = 0;
+  ].map((signal) => {
+    const earned = Math.round(signal.weight * signal.ratio);
+    return { ...signal, earned, points: earned - signal.baseline };
+  });
+  const base = signals.reduce((total, signal) => total + signal.baseline, 0);
   const score = signals.reduce((total, signal) => total + signal.points, base);
   const tier = score >= 85 ? "EXCELLENT" : score >= 75 ? "STRONG" : score >= 60 ? "STABLE" : score >= 45 ? "ATTENTION" : "CRITICAL";
 

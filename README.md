@@ -55,7 +55,7 @@ The hero, river, and story previously used independent totals and examples. VEYR
 | Food pacing | Sum food expenses excluding one-offs and divide by elapsed days. Multiply by the month length for a projection. Divide the projection by the food cap for its projected usage. |
 | Recurring subscriptions | Count and sum recurring expense entries in Subscriptions & SaaS. |
 
-The score starts at **0 points**. Each dimension contributes its rounded points independently so the displayed breakdown adds up exactly:
+The score starts at **50 points**, made up of reference points of 25 for savings, 10 for budget, and 7.5 each for stability and goals. Each displayed signal subtracts its reference points from the rounded earned points below. The baseline plus those signed adjustments equals the score:
 
 - **35 points** for cash retained rate divided by the 30% target, bounded between zero and one.
 - **25 points** for the fraction of monitored categories at or below their caps.

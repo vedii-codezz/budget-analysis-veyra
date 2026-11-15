@@ -96,7 +96,7 @@ export const BootSequence: React.FC<{ onComplete: () => void }> = ({
 
           {/* Bottom Telemetry Status */}
           <div className="flex items-center justify-between border-t border-line pt-4 font-mono text-[10px] text-foreground-dim uppercase tracking-wider">
-            <span>FINANCIAL INTELLIGENCE SUBSYSTEMS</span>
+            <span>DEMO DATA · AUGUST 2026</span>
           </div>
         </motion.div>
       )}

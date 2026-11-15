@@ -4,7 +4,6 @@ import { FinanceDefinitions } from "@/components/ui/FinanceDefinitions";
 import React, { useState, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { useFinanceStore } from "@/store/finance";
-import { usePreferencesStore } from "@/store/preferences";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
 import {
@@ -12,6 +11,7 @@ import {
   AlertTriangle,
   Shield,
 } from "lucide-react";
+import { formatSignedNumber } from "@/lib/utils/currency";
 import { clsx } from "clsx";
 
 export const VeyraScore: React.FC = () => {
@@ -21,18 +21,10 @@ export const VeyraScore: React.FC = () => {
   const [selectedSignal, setSelectedSignal] = useState<string | null>(null);
 
   const statusColor = cashRetained < 0 ? "text-danger" : health.tier === "ATTENTION" ? "text-warn" : "text-foreground-muted";
-  const reducedMotion = usePreferencesStore((s) => s.reducedMotion);
-
-  const peripheralMetrics = health.signals.map((signal) => ({
-    ...signal,
-    label: signal.title,
-    value: `${signal.points}/${signal.weight}`,
-    sub: signal.desc,
-  }));
-  const positiveSignals = health.signals.map((signal) => ({
-    ...signal,
-    impact: `+${signal.points} PTS`,
-  }));
+  const signalGroups = [
+    { label: "Positive Signals", icon: CheckCircle2, signals: health.signals.filter((signal) => signal.points >= 0) },
+    { label: "Pressure Points", icon: AlertTriangle, signals: health.signals.filter((signal) => signal.points < 0) },
+  ];
 
   return (
     <section
@@ -68,7 +60,7 @@ export const VeyraScore: React.FC = () => {
             >
               <svg aria-hidden="true" viewBox="0 0 100 100" className="absolute inset-0 h-full w-full -rotate-90">
                 <circle cx="50" cy="50" r="49" pathLength="100" fill="none" stroke="var(--surface)" strokeWidth="1" />
-                <circle cx="50" cy="50" r="49" pathLength="100" fill="none" stroke="var(--text-secondary)"
+                <circle cx="50" cy="50" r="49" pathLength="100" fill="none" stroke="var(--accent)"
                   strokeWidth="1" strokeDasharray={health.score + " 100"} />
               </svg>
               <span className="font-mono text-[10px] tracking-mega uppercase text-foreground-muted mb-1">
@@ -95,19 +87,19 @@ export const VeyraScore: React.FC = () => {
 
             {/* Supporting Dimensions Grid */}
             <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full max-w-md mt-8">
-              {peripheralMetrics.map((pm) => (
+              {health.signals.map((pm) => (
                 <div
                   key={pm.id}
                   className="bg-surface border border-line p-3.5 space-y-1"
                 >
                   <div className="flex items-center justify-between text-xs font-mono text-foreground-muted">
-                    <span>{pm.label}</span>
+                    <span>{pm.title}</span>
                     <span className="text-foreground font-medium tabular-nums">
-                      {pm.value}
+                      {pm.earned}/{pm.weight}
                     </span>
                   </div>
-                  <div className="text-[10px] font-mono text-foreground-muted truncate">
-                    {pm.sub}
+                  <div className="text-xs font-mono text-foreground-muted">
+                    {pm.desc}
                   </div>
                 </div>
               ))}
@@ -128,15 +120,17 @@ export const VeyraScore: React.FC = () => {
               </p>
             </div>
 
-            <FinanceDefinitions />
-            {/* Positive Signals Group */}
-            <div className="space-y-3">
+            <p className="font-mono text-xs text-foreground-muted">
+              Baseline {health.base} <FinanceDefinitions />
+            </p>
+            {signalGroups.filter(({ signals }) => signals.length > 0).map(({ label, icon: Icon, signals }) => (
+            <div key={label} className="space-y-3">
               <div className="flex items-center gap-2 font-mono text-xs text-foreground-muted uppercase tracking-wider">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Positive Signals</span>
+                <Icon aria-hidden="true" className="w-3.5 h-3.5" />
+                <span>{label}</span>
               </div>
               <div className="space-y-2">
-                {positiveSignals.map((sig) => (
+                {signals.map((sig) => (
                   <div
                     key={sig.id}
                     onClick={() => setSelectedSignal(sig.id === selectedSignal ? null : sig.id)}
@@ -149,7 +143,7 @@ export const VeyraScore: React.FC = () => {
                   >
                     <div className="flex items-center justify-between font-mono text-xs">
                       <span className="text-foreground font-medium">{sig.title}</span>
-                      <span className="text-foreground-muted">{sig.impact}</span>
+                      <span className="text-foreground-muted">{formatSignedNumber(sig.points, Number.isInteger(sig.points) ? 0 : 1, " PTS")}</span>
                     </div>
                     <p className="text-xs text-foreground-muted font-light mt-1 leading-relaxed">
                       {sig.desc}
@@ -159,8 +153,9 @@ export const VeyraScore: React.FC = () => {
               </div>
             </div>
 
+            ))}
             <p className="font-mono text-xs text-foreground-muted">
-              Base {health.base} + {health.signals.map((signal) => signal.points).join(" + ")} = {health.score}
+              {health.base} {health.signals.map(({ points }) => formatSignedNumber(points, Number.isInteger(points) ? 0 : 1)).join(" ")} = {health.score}
             </p>
           </div>
         </div>

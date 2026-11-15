@@ -60,6 +60,12 @@ export function formatCurrency(
   return `${prefix}${symbol}${formattedNum}`;
 }
 
+export function formatSignedNumber(value: number, decimals = 1, unit = ""): string {
+  const magnitude = Math.abs(value).toFixed(decimals);
+  const sign = Number(magnitude) === 0 ? "" : value < 0 ? String.fromCharCode(8722) : "+";
+  return sign + magnitude + unit;
+}
+
 export function formatPercentage(value: number, includeDecimals = 1): string {
   return `${value.toFixed(includeDecimals).replace("-", "−")}%`;
 }

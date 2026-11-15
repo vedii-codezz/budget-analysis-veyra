@@ -1,5 +1,6 @@
 "use client";
 
+import { CalculationInfo, metricDefinitions } from "@/components/ui/FinanceDefinitions";
 import React, { useState, useEffect, useRef } from "react";
 import { registerGSAP } from "@/lib/animation/gsap";
 import { usePreferencesStore } from "@/store/preferences";
@@ -132,6 +133,8 @@ export const VeyraInsights: React.FC = () => {
               <div className="bg-surface backdrop-blur-xl border border-line p-6 sm:p-8 space-y-6">
                 <span className="font-mono text-xs text-foreground-muted uppercase tracking-wider block border-b border-line pb-3">
                   Evidence Proof
+                  {activeInsightIndex === 0 && <CalculationInfo label="Weekend premium">{metricDefinitions.weekend}</CalculationInfo>}
+                  {activeInsightIndex === 1 && <CalculationInfo label="Micro-purchases">{metricDefinitions.micro}</CalculationInfo>}
                 </span>
 
                 <div className="space-y-3 font-mono text-xs">
@@ -143,7 +146,7 @@ export const VeyraInsights: React.FC = () => {
                       </div>
                       {barWidths[index] !== undefined && (
                         <div aria-hidden="true" className="h-1.5 bg-background">
-                          <div className={index === 0 ? "h-full bg-foreground" : "h-full bg-foreground-dim"}
+                          <div className={barWidths[index] > barWidths[1 - index] ? "h-full bg-accent" : "h-full bg-foreground-dim"}
                             style={{ width: (barWidths[index] / maxAverage) * 100 + "%" }} />
                         </div>
                       )}

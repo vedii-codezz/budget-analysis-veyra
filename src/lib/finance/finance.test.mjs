@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { deriveFinance, transactions } from "./index.ts";
 
+import { formatSignedNumber } from "../utils/currency.ts";
+
 const metrics = deriveFinance(transactions);
 
 test("river balances to income, with cash retained as its liquid buffer", () => {
@@ -40,7 +42,7 @@ test("a one-off can create a deficit without changing food pacing or stability",
 
 test("additional income increases cash retained without contributing to outflows", () => {
   const next = deriveFinance([...transactions, {
-    id: "test-pay", amount: 250, type: "income", category: "Other",
+    id: "test-pay", amount: 250, type: "income", category: "Income",
     date: "2026-08-31", title: "Extra pay", merchant: "Test",
   }]);
   assert.equal(next.cashRetained, metrics.cashRetained + 250);
@@ -56,4 +58,28 @@ test("budget warning starts above 90 percent and breach starts above the cap", (
     }]);
     assert.equal(result.budgetUsage.find(({ category }) => category === "Other").status, status);
   }
+});
+
+test("benchmark delta uses a single sign and points", () => {
+  assert.equal(formatSignedNumber(metrics.cashRetainedRate - 30, 1, " pts"), String.fromCharCode(8722) + "11.1 pts");
+  assert.equal(formatSignedNumber(2, 1, " pts"), "+2.0 pts");
+  assert.equal(formatSignedNumber(-0.001, 1, " pts"), "0.0 pts");
+  assert.equal(metrics.health.base, 50);
+  assert.ok(metrics.health.signals.find(({ id }) => id === "retention").points < 0);
+});
+
+test("Flight to Mumbai breaches Travel and lowers the score", () => {
+  const flight = {
+    id: "flight-test", title: "Flight to Mumbai", merchant: "Air India",
+    type: "expense", amount: 24000, category: "Travel", date: "2026-08-31",
+  };
+  const next = deriveFinance([...transactions, flight]);
+  assert.equal(next.cashRetained, -6080);
+  assert.ok(next.cashRetainedRate < 0);
+  assert.ok(next.health.score < metrics.health.score);
+  const travel = next.budgetUsage.find(({ category }) => category === "Travel");
+  assert.equal(travel.percentage, 480);
+  assert.equal(travel.status, "exceeded");
+  assert.equal(next.river.cashRetained, -6080);
+  assert.equal(next.categorySpend.Travel, 24000);
 });
