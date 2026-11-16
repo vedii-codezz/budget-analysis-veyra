@@ -1,123 +1,36 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
 import { usePreferencesStore } from "@/store/preferences";
-import { useUIStore } from "@/store/ui";
-import { Sparkles, EyeOff, Play } from "lucide-react";
-import { clsx } from "clsx";
 
-interface NavbarProps {
-  onOpenStory?: () => void;
-}
+const links = [
+  ["Overview", "#hero"],
+  ["Universe", "#universe"],
+  ["Score", "#score"],
+  ["Flow", "#flow"],
+  ["Command", "#dashboard"],
+];
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenStory }) => {
-  const [scrolled, setScrolled] = useState(false);
+export function Navbar({ onOpenStory }: { onOpenStory: () => void }) {
   const { reducedMotion, toggleReducedMotion } = usePreferencesStore();
-  const { activeSection, setActiveSection } = useUIStore();
-
-  useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 40);
-    };
-    window.addEventListener("scroll", onScroll);
-
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-    };
-  }, []);
-
-  const navLinks = [
-    { id: "hero", label: "Overview", href: "#hero" },
-    { id: "story", label: "Trajectory", href: "#story" },
-    { id: "universe", label: "Universe", href: "#universe" },
-    { id: "score", label: "Score", href: "#score" },
-    { id: "flow", label: "Flow", href: "#flow" },
-    { id: "insights", label: "Insights", href: "#insights" },
-    { id: "dashboard", label: "Command", href: "#dashboard" },
-  ];
 
   return (
-    <header
-      className={clsx(
-        "fixed top-0 left-0 right-0 z-40 transition-all duration-500",
-        scrolled
-          ? "bg-background backdrop-blur-2xl border-b border-line py-3"
-          : "bg-transparent py-5"
-      )}
-    >
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 md:px-12 flex items-center justify-between">
-        {/* Brand Ident */}
-        <a
-          href="#hero"
-          className="flex items-center gap-3 group select-none"
-        >
-          <div className="w-2 h-2 rounded-none bg-foreground transition-transform duration-500 group-hover:rotate-45" />
-          <div className="flex flex-col">
-            <span className="font-mono text-xs tracking-widest text-foreground font-semibold">
-              VEYRA<span className="text-foreground-dim font-normal">{" // 01"}</span>
-            </span>
-            <span className="text-xs font-mono text-foreground-dim uppercase tracking-wider hidden sm:inline">
-              Financial Intelligence
-            </span>
-          </div>
-        </a>
-
-        {/* Minimal Navigation */}
-        <nav className="hidden lg:flex items-center gap-1 border border-line bg-surface backdrop-blur-md px-3 py-1.5 rounded-full">
-          {navLinks.map((link) => {
-            const isActive = activeSection === link.id;
-            return (
-              <a
-                key={link.id}
-                href={link.href}
-                onClick={() => setActiveSection(link.id)}
-                className={clsx(
-                  "relative isolate px-3.5 py-1 font-mono text-xs tracking-wider uppercase transition-colors duration-300 rounded-full",
-                  isActive
-                    ? "text-accent font-medium"
-                    : "text-foreground-dim hover:text-foreground"
-                )}
-              >
-                {link.label}
-                {isActive && (
-                  <span className="absolute inset-0 bg-background rounded-full -z-10" />
-                )}
-              </a>
-            );
-          })}
+    <header className="fixed inset-x-0 top-0 z-40 bg-background/95">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-y-3 px-6 py-4 font-mono text-xs sm:px-8 md:px-12 lg:px-16">
+        <a href="#hero" className="font-semibold tracking-widest text-foreground">VEYRA</a>
+        <nav aria-label="Sections" className="order-last flex w-full justify-between gap-2 text-foreground-dim sm:order-none sm:w-auto sm:justify-start lg:gap-6">
+          {links.map(([label, href]) => (
+            <a key={href} href={href} className="hover:text-foreground">{label}</a>
+          ))}
         </nav>
-
-        {/* Right Status Indicators & Controls */}
-        <div className="flex items-center gap-3 sm:gap-4">
-          {/* Launch VEYRA Story Button */}
-          {onOpenStory && (
-            <button
-              onClick={onOpenStory}
-              className="flex items-center gap-1.5 px-3 py-1 bg-transparent hover:bg-background border border-line font-mono text-xs text-foreground-muted uppercase tracking-widest transition-colors"
-            >
-              <Play className="w-2.5 h-2.5 text-foreground-dim" />
-              <span>Story Recap</span>
-            </button>
-          )}
-
-          {/* Reduced Motion Toggle */}
-          <button
-            onClick={toggleReducedMotion}
-            title={reducedMotion ? "Enable full cinematic motion" : "Reduce motion for comfort"}
-            className={clsx(
-              "flex items-center gap-1.5 px-2.5 py-1 font-mono text-xs tracking-wider uppercase border transition-colors duration-300",
-              reducedMotion
-                ? "bg-surface border-line text-foreground-muted"
-                : "border-line text-foreground-muted hover:text-foreground hover:border-line"
-            )}
-          >
-            {reducedMotion ? <EyeOff className="w-3 h-3" /> : <Sparkles className="w-3 h-3" />}
-            <span className="hidden sm:inline">
-              {reducedMotion ? "Motion: Reduced" : "Motion: High"}
-            </span>
+        <div role="group" aria-label="Utilities" className="flex items-center gap-4 text-foreground-dim">
+          <button type="button" onClick={onOpenStory} className="hover:text-foreground">Story Recap</button>
+          <button type="button" onClick={toggleReducedMotion} aria-pressed={reducedMotion}
+            title={reducedMotion ? "Reduced motion is on" : "Reduced motion is off"}
+            className="hover:text-foreground aria-pressed:underline">
+            Motion
           </button>
         </div>
       </div>
     </header>
   );
-};
+}

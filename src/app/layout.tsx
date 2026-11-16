@@ -3,8 +3,6 @@ import { join } from "node:path";
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { CustomCursor } from "@/components/cursor/CustomCursor";
-import { Navbar } from "@/components/nav/Navbar";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -50,8 +48,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} dark`}>
-      <body className="bg-background text-foreground font-sans bg-noise antialiased">
-        <CustomCursor />
+      <body className="bg-background text-foreground font-sans antialiased">
         <main className="relative z-10">{children}</main>
       </body>
     </html>

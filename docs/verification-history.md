@@ -1,5 +1,12 @@
 # Verification history
 
+## Simplification · 2026-11-16
+
+- Chrome compared the August demo at 1280px and 390px with baseline commit `5008a7c`. The comparison contains 20 screenshots. The 1280px initial state had 222 fewer counted text fragments, controls and visuals across the page and navigation.
+- At both widths the updated dashboard fit the viewport, kept the ledger header sticky, filtered entries, opened and closed the four-slide tour, and updated the hero balance after entry. Add Transaction regained focus after submission, and reset restored the seed.
+- The baseline logged a hydration error for a calculation dialog nested in a paragraph. It did not recur in the simplified view.
+- The production build, ESLint, TypeScript, all nine finance tests, and the palette check passed. All 20 screenshot links and PNG widths in the report were verified.
+
 ## 2026-11-15
 
 | Date | Check | Result | Evidence |

@@ -10,7 +10,6 @@ import { ScrollStory } from "@/components/story/ScrollStory";
 import { SpendingUniverse } from "@/components/universe/SpendingUniverse";
 import { VeyraScore } from "@/components/score/VeyraScore";
 import { CashFlowRiver } from "@/components/flow/CashFlowRiver";
-import { VeyraInsights } from "@/components/insights/VeyraInsights";
 import { BasicDashboard } from "@/components/dashboard/BasicDashboard";
 import { BootSequence } from "@/components/cinematic/BootSequence";
 import { VeyraStoryModal } from "@/components/story/VeyraStoryModal";
@@ -63,8 +62,7 @@ export default function Home() {
         <SpendingUniverse />
         <VeyraScore />
         <CashFlowRiver />
-        <VeyraInsights />
-        <BasicDashboard onOpenStory={() => setIsStoryOpen(true)} />
+        <BasicDashboard />
       </div>
 
       <VeyraStoryModal
