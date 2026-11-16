@@ -5,7 +5,7 @@ import { budgets, isMonthDate, isValidEntry, monthEnd, monthStart } from "@/lib/
 import { useFinanceStore } from "@/store/finance";
 import type { TransactionCategory } from "@/types/finance";
 
-const fieldClass = "block w-full mt-1 bg-background border border-line px-3 py-2 text-foreground";
+const fieldClass = "block w-full mt-1 bg-background rounded-sm border border-line px-3 py-2 text-foreground";
 
 function defaultDate() {
   const today = new Date().toLocaleDateString("sv-SE");
@@ -52,8 +52,8 @@ export function TransactionDialog({ onClose }: { onClose: () => void }) {
   return (
     <dialog ref={dialog} onCancel={(event) => { event.preventDefault(); onClose(); }}
       aria-labelledby="transaction-heading"
-      className="max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md overflow-auto border border-line bg-surface p-6 text-foreground backdrop:bg-background/80 backdrop:backdrop-blur-md">
-      <h3 id="transaction-heading" className="border-b border-line pb-3 font-mono text-sm uppercase">Add transaction</h3>
+      className="max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md overflow-auto rounded-sm border border-line bg-surface p-6 text-foreground backdrop:bg-background/80 backdrop:backdrop-blur-md">
+      <h3 id="transaction-heading" className="font-mono text-sm uppercase">Add transaction</h3>
       <form onSubmit={submit} className="mt-4 space-y-3 font-mono text-xs">
         <fieldset className="flex gap-4">
           <legend className="mb-1 text-foreground-muted">Type</legend>
@@ -83,8 +83,8 @@ export function TransactionDialog({ onClose }: { onClose: () => void }) {
         </>}
         {error && <p role="alert" className="text-foreground-muted">{error}</p>}
         <div className="flex justify-end gap-3 pt-3">
-          <button type="button" onClick={onClose} className="border border-line px-4 py-2 text-foreground-muted">Cancel</button>
-          <button type="submit" className="bg-accent px-5 py-2 font-medium text-background">Commit Entry</button>
+          <button type="button" onClick={onClose} className="rounded-sm border border-line px-4 py-2 text-foreground-muted">Cancel</button>
+          <button type="submit" className="rounded-sm bg-foreground px-5 py-2 font-medium text-background">Commit Entry</button>
         </div>
       </form>
     </dialog>

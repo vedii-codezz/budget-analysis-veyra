@@ -18,7 +18,8 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 1px solid var(--text-secondary);
+    outline-offset: 3px;
   }
 
   input::placeholder {
@@ -87,5 +88,48 @@
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+}
+
+@layer components {
+  .editorial-section {
+    border-top: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+    padding-block: 72px;
+    scroll-margin-top: 4.75rem;
+  }
+
+  .editorial-inner {
+    @apply mx-auto max-w-7xl px-6 sm:px-8 md:px-12 lg:px-16;
+  }
+
+  .editorial-title {
+    @apply mt-4 text-4xl font-extralight leading-[1.05] tracking-tightest md:text-5xl lg:text-7xl;
+    max-width: 60ch;
+    overflow-wrap: anywhere;
+  }
+
+  .editorial-number {
+    @apply text-5xl font-light tabular-nums tracking-tightest sm:text-6xl md:text-7xl;
+    overflow-wrap: anywhere;
+  }
+
+  .editorial-link {
+    @apply cursor-pointer text-sm text-foreground-muted hover:text-foreground;
+  }
+
+  .editorial-inner p, dialog p {
+    max-width: 60ch;
+  }
+
+  .ledger-header {
+    top: 4.75rem;
+  }
+
+  @media (min-width: 640px) {
+    .ledger-header { top: 3rem; }
+  }
+
+  @media (min-width: 768px) {
+    .editorial-section { padding-block: 120px; scroll-margin-top: 3rem; }
   }
 }

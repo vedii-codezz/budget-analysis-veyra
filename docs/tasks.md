@@ -68,3 +68,11 @@
 - [x] 14. Use Income for payroll and added income.
 - [x] 15. Remove the ticking navbar timer.
 - [x] 16. Check palette contrast and fix the active navigation text.
+
+## Simplification · 2026-11-16
+
+- [x] Consolidate Hero and Trajectory figures and move Insights into Flow.
+- [x] Remove filled section panels, trackers and repeated labels. Keep the Universe and Score visuals.
+- [x] Reduce navigation to five links and Story Recap to four text-only slides.
+- [x] Keep the ledger filter and sticky header. Move budgets and the day scrubber into disclosures.
+- [x] Capture the original and simplified Hero, Universe, Score, Flow and Command at 1280px and 390px.
